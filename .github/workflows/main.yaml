@@ -15,10 +15,9 @@ jobs:
         run: |
           pip install requests pytube pylint
 
-  get-katas-to-test:
+  ListKatas:
+    needs: InstallDependencies
     runs-on: ubuntu-latest
-    outputs:
-      changed_katas: ${{ steps.katas_to_test.outputs.katas }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -31,12 +30,11 @@ jobs:
           echo "kata_list=$kata_json" >> $GITHUB_OUTPUT
 
   test-katas:
-    needs: get-katas-to-test
+    needs: ListKatas
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        kata_name: ${{ fromJson(needs.get-katas-to-test.outputs.changed_katas) }}
-    if: ${{ matrix.kata_name }}
+        kata_name: ${{ fromJson(needs.ListKatas.outputs.kata_list) }}
     steps:
       - uses: actions/checkout@v2
       - name: Kata Test
