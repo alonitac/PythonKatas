@@ -15,6 +15,16 @@ jobs:
         run: |
           pip install requests pytube pylint
 
+  LintTest:
+    needs: InstallDependencies
+    runs-on: ubuntu-latest
+    steps:
+      - name: Linting Test
+        run: |
+          cd katas
+          pylint *.py || true
+
+
   ListKatas:
     needs: InstallDependencies
     runs-on: ubuntu-latest
@@ -32,7 +42,7 @@ jobs:
           echo "Katas: $kata_json"
           echo "tests=$kata_json" >> $GITHUB_OUTPUT
 
-  test-katas:
+  test:
     needs: ListKatas
     runs-on: ubuntu-latest
     strategy:
@@ -47,7 +57,4 @@ jobs:
           cd katas
           cp test/_score.py .
           python _score.py
-      - name: Linting Test
-        run: |
-          cd katas
-          pylint *.py || true
+
