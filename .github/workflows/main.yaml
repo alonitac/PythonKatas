@@ -36,9 +36,9 @@ jobs:
 
       - name: Find Katas to test
         id: kata_tests
+        working-directory: katas/test
         run: |  
-          kata_files=$(find katas/test/ -name 'test_*.py')
-          kata_json=$(echo "$kata_files" | jq -R -s -c 'split("\n")[:-1]')
+          kata_json=$(ls test_*.py | jq -R -s -c 'split("\n")[:-1]')
           echo "Katas: $kata_json"
           echo "tests=$kata_json" >> $GITHUB_OUTPUT
 
@@ -52,9 +52,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Kata Test
+        working-directory: katas
         run: |
           export PYTHONPATH=$PYTHONPATH:$(pwd)
-          cd katas
-          cp test/_score.py .
-          python _score.py
+          python ${{ matrix.kata_name }}
 
