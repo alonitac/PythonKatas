@@ -23,7 +23,6 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Find Katas to test
-        id: katas_to_test
         run: |  
           kata_files=$(find katas/test/ -name 'test_*.py')
           kata_json=$(echo "$kata_files" | jq -R -s -c 'split("\n")[:-1]')
