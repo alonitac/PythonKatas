@@ -19,9 +19,12 @@ jobs:
     needs: InstallDependencies
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: Linting Test
+        working-directory: katas
         run: |
-          cd katas
           pylint *.py || true
 
 
