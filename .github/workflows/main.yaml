@@ -36,6 +36,7 @@ jobs:
     needs: ListKatas
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         kata_name: ${{ fromJson(needs.ListKatas.outputs.tests) }}
     steps:
