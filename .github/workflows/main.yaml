@@ -27,6 +27,7 @@ jobs:
         run: |  
           kata_files=$(find katas/test/ -name 'test_*.py')
           kata_json=$(echo "$kata_files" | jq -R -s -c 'split("\n")[:-1]')
+          echo "Katas: $kata_json"
           echo "kata_list=$kata_json" >> $GITHUB_OUTPUT
 
   test-katas:
