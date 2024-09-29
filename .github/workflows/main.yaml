@@ -19,7 +19,7 @@ jobs:
     needs: InstallDependencies
     runs-on: ubuntu-latest
     outputs:
-      output1: ${{ steps.kata_tests.outputs.tests }}
+      tests: ${{ steps.kata_tests.outputs.tests }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        kata_name: ${{ fromJson(needs.kata_tests.outputs.tests) }}
+        kata_name: ${{ fromJson(needs.ListKatas.outputs.tests) }}
     steps:
       - uses: actions/checkout@v2
       - name: Kata Test
