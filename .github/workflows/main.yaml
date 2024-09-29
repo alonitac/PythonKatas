@@ -18,23 +18,26 @@ jobs:
   ListKatas:
     needs: InstallDependencies
     runs-on: ubuntu-latest
+    outputs:
+      output1: ${{ steps.kata_tests.outputs.tests }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Find Katas to test
+        id: kata_tests
         run: |  
           kata_files=$(find katas/test/ -name 'test_*.py')
           kata_json=$(echo "$kata_files" | jq -R -s -c 'split("\n")[:-1]')
           echo "Katas: $kata_json"
-          echo "kata_list=$kata_json" >> $GITHUB_OUTPUT
+          echo "tests=$kata_json" >> $GITHUB_OUTPUT
 
   test-katas:
     needs: ListKatas
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        kata_name: ${{ fromJson(needs.ListKatas.outputs.kata_list) }}
+        kata_name: ${{ fromJson(needs.kata_tests.outputs.tests) }}
     steps:
       - uses: actions/checkout@v2
       - name: Kata Test
