@@ -58,5 +58,5 @@ jobs:
         working-directory: katas
         run: |
           export PYTHONPATH=$PYTHONPATH:$(pwd)
-          python ${{ matrix.kata_name }}
+          python test/${{ matrix.kata_name }}
 
