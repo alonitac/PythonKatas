@@ -40,18 +40,9 @@ jobs:
       - name: Kata Test
         working-directory: katas
         run: |
-          pip install pytest
+          pip install unittest-xml-reporting
           export PYTHONPATH=$PYTHONPATH:$(pwd)
-          pytest test/ -rP --junitxml=results.xml --junit-prefix="KatasTest"
-
-
-      - name: list success
-        working-directory: katas
-        if: always()
-        run: |
-          grep -oP '(?<=<testcase name=")[^"]+' results.xml | grep -vP '(?<=</failure>)'
-
-
+          python _score.py
 
       - name: Upload Test Results as Artifact
         uses: actions/upload-artifact@v3

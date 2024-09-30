@@ -1,5 +1,5 @@
 import unittest
-from python_katas.car import Car
+from katas.car import Car
 
 
 class TestCarL1(unittest.TestCase):

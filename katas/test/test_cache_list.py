@@ -1,5 +1,5 @@
 import unittest
-from python_katas.cache_list import CacheList
+from katas.cache_list import CacheList
 
 
 class TestCacheListL1(unittest.TestCase):
