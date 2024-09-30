@@ -37,12 +37,10 @@ jobs:
         run: |
           pip install pytest
           export PYTHONPATH=$PYTHONPATH:$(pwd)
-          pytest test/ --junitxml=results.xml
+          pytest test/ --junitxml=results.xml; ls
 
-      - name: Publish Test Results
-        uses: dorny/test-reporter@v1
-        if: always()
+      - name: Test Summary
+        uses: test-summary/action@v2
         with:
-          name: Pytest
-          path: katas/results.xml
-          reporter: jest-junit
+          paths: "katas/results.xml"
+        if: always()
