@@ -47,6 +47,7 @@ jobs:
 
       - name: list success
         working-directory: katas
+        if: always()
         run: |
           grep -oP '(?<=<testcase name=")[^"]+' katas/results.xml | grep -vP '(?<=</failure>)'
 
