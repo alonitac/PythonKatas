@@ -48,7 +48,6 @@ jobs:
         uses: dorny/test-reporter@v1
         if: always()
         with:
-          name: Maven Tests
           path: katas/results.xml
           reporter: java-junit
           fail-on-error: false
