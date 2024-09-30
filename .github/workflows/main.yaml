@@ -53,10 +53,10 @@ jobs:
       matrix:
         kata_name: ${{ fromJson(needs.ListKatas.outputs.tests) }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Kata Test
-        working-directory: katas
         run: |
           export PYTHONPATH=$PYTHONPATH:$(pwd)
+          cd katas
           python test/${{ matrix.kata_name }}
 
