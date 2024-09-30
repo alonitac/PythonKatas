@@ -44,6 +44,14 @@ jobs:
           export PYTHONPATH=$PYTHONPATH:$(pwd)
           pytest test/ --junitxml=results.xml --junit-prefix="KatasTest"
 
+
+      - name: list success
+        working-directory: katas
+        run: |
+          grep -oP '(?<=<testcase name=")[^"]+' katas/results.xml | grep -vP '(?<=</failure>)'
+
+
+
       - name: Upload Test Results as Artifact
         uses: actions/upload-artifact@v3
         if: always()
@@ -59,3 +67,4 @@ jobs:
           path: katas/results.xml
           reporter: java-junit
           fail-on-error: false
+          max-annotations: '50'
