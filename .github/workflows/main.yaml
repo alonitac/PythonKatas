@@ -1,4 +1,4 @@
-name: Trigger Kata Tests
+name: Test Katas
 
 on:
   push:
@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: install pylint
         run: |
-          pip install requests pytube pylint
+          pip install requests pytube pylint pytest
 
   LintTest:
     needs: InstallDependencies
@@ -27,36 +27,23 @@ jobs:
         run: |
           pylint *.py || true
 
-
-  ListKatas:
+  Test:
     needs: InstallDependencies
     runs-on: ubuntu-latest
-    outputs:
-      tests: ${{ steps.kata_tests.outputs.tests }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Find Katas to test
-        id: kata_tests
-        working-directory: katas/test
-        run: |  
-          kata_json=$(ls test_*.py | jq -R -s -c 'split("\n")[:-1]')
-          echo "Katas: $kata_json"
-          echo "tests=$kata_json" >> $GITHUB_OUTPUT
-
-  test:
-    needs: ListKatas
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        kata_name: ${{ fromJson(needs.ListKatas.outputs.tests) }}
     steps:
       - uses: actions/checkout@v2
       - name: Kata Test
         working-directory: katas
         run: |
           export PYTHONPATH=$PYTHONPATH:$(pwd)
-          python test/${{ matrix.kata_name }}
+          cp test/_score.py .
+#          python _score.py
+          pytest test/ --junitxml=results.xml
 
+      - name: Publish Test Results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Pytest
+          path: katas/results.xml
+          reporter: junit
