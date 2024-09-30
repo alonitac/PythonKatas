@@ -1,4 +1,4 @@
-name: Test Katas
+name: Trigger Kata Tests
 
 on:
   push:
@@ -7,56 +7,56 @@ on:
 #    paths:
 #      - 'katas/**'
 
-permissions:
-  contents: read
-  actions: read
-  checks: write
-
 jobs:
   InstallDependencies:
     runs-on: ubuntu-latest
     steps:
       - name: install pylint
         run: |
-          pip install requests pytube pylint pytest
+          pip install requests pytube pylint
 
   LintTest:
     needs: InstallDependencies
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
       - name: Linting Test
         working-directory: katas
         run: |
           pylint *.py || true
 
-  Test:
+
+  ListKatas:
     needs: InstallDependencies
     runs-on: ubuntu-latest
+    outputs:
+      tests: ${{ steps.kata_tests.outputs.tests }}
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Find Katas to test
+        id: kata_tests
+        working-directory: katas/test
+        run: |  
+          kata_json=$(ls test_*.py | jq -R -s -c 'split("\n")[:-1]')
+          echo "Katas: $kata_json"
+          echo "tests=$kata_json" >> $GITHUB_OUTPUT
+
+  test:
+    needs: ListKatas
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        kata_name: ${{ fromJson(needs.ListKatas.outputs.tests) }}
+    steps:
+      - uses: actions/checkout@v2
       - name: Kata Test
         working-directory: katas
         run: |
-          pip install unittest-xml-reporting
           export PYTHONPATH=$PYTHONPATH:$(pwd)
-          python _score.py
+          python test/${{ matrix.kata_name }}
 
-      - name: Upload Test Results as Artifact
-        uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: test-results
-          path: katas/results.xml
-
-      - name: Report
-        uses: dorny/test-reporter@v1
-        if: always()
-        with:
-          name: Test Summary
-          path: katas/results.xml
-          reporter: java-junit
-          fail-on-error: false
-          max-annotations: '50'
