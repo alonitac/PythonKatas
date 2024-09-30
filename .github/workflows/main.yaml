@@ -39,8 +39,16 @@ jobs:
           export PYTHONPATH=$PYTHONPATH:$(pwd)
           pytest test/ --junitxml=results.xml; ls
 
-      - name: Test Summary
-        uses: test-summary/action@v2
-        with:
-          paths: "katas/results.xml"
+      - name: Report
+        uses: dorny/test-reporter@v1
         if: always()
+        with:
+          name: Maven Tests
+          path: katas/results.xml
+          reporter: java-junit
+
+#      - name: Test Summary
+#        uses: test-summary/action@v2
+#        with:
+#          paths: "katas/results.xml"
+#        if: always()
