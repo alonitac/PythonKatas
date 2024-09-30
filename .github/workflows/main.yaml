@@ -45,4 +45,4 @@ jobs:
         with:
           name: Pytest
           path: katas/results.xml
-          reporter: junit
+          reporter: jest-junit
