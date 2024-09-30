@@ -42,7 +42,7 @@ jobs:
         run: |
           pip install pytest
           export PYTHONPATH=$PYTHONPATH:$(pwd)
-          pytest test/ --junitxml=results.xml --junit-prefix="KatasTest"
+          pytest test/ -rP --junitxml=results.xml --junit-prefix="KatasTest"
 
 
       - name: list success
