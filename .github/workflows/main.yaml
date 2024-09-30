@@ -36,8 +36,6 @@ jobs:
         working-directory: katas
         run: |
           export PYTHONPATH=$PYTHONPATH:$(pwd)
-          cp test/_score.py .
-#          python _score.py
           pytest test/ --junitxml=results.xml
 
       - name: Publish Test Results
