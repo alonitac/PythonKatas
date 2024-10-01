@@ -65,7 +65,8 @@ jobs:
           touch markers.json
           git add markers.json
           git commit -m "Update markers.json" || echo "No changes to commit"
-          git push origin gh-pages # Ensure gh-pages branch exists or create it if necessary
+          git branch gh-pages || true
+          git push origin gh-pages
 
       - name: Notify user about GitHub Pages site
         run: |
