@@ -53,6 +53,7 @@ jobs:
   CreateMap:
     needs: Test
     runs-on: ubuntu-latest
+    if: always()
     steps:
       - name: Commit and push markers.json to gh-pages
         run: |
