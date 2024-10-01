@@ -7,6 +7,9 @@ on:
 #    paths:
 #      - 'katas/**'
 
+permissions:
+  contents: write
+
 jobs:
   LintTest:
     runs-on: ubuntu-latest
