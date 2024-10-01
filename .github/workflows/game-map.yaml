@@ -19,25 +19,16 @@ jobs:
           FORK_REPO=$(jq -r .pull_request.head.repo.name < "${{ github.event_path }}")
           
           WORKFLOW_ID=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/$FORK_OWNER/$FORK_REPO/actions/workflows | jq -r '.workflows[] | select(.path == ".github/workflows/main.yaml") | .id')
-          WORKFLOW_RUNS=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/$FORK_OWNER/$FORK_REPO/actions/workflows/$WORKFLOW_ID/runs)
+          WORKFLOW_RUNS=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/$FORK_OWNER/$FORK_REPO/actions/workflows/$WORKFLOW_ID/runs?per_page=1)
           
           RUN_ID=$(echo "$WORKFLOW_RUNS" | jq -r '.workflow_runs[0].id')       
-          ARTIFACTS=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/$FORK_OWNER/$FORK_REPO/actions/runs/$RUN_ID/artifacts")
-          ARTIFACT_ID=$(echo "$ARTIFACTS" | jq -r '.artifacts[] | select(.name == "test-results") | .id')
-
-          if [ -n "$ARTIFACT_ID" ]; then
-            ARTIFACT_URL="https://api.github.com/repos/$FORK_OWNER/$FORK_REPO/actions/artifacts/$ARTIFACT_ID/zip"
-            curl -L -H "Authorization: Bearer $GITHUB_TOKEN" -o artifact.zip "$ARTIFACT_URL"
-            
-            unzip artifact.zip -d ./artifacts
-          fi
-
           if [ -z "$RUN_ID" ]; then
             echo "No successful workflow runs found in fork."
             exit 1
           fi
           echo "Latest successful workflow run ID: $RUN_ID"
 
+          curl "https://api.github.com/repos/$FORK_OWNER/$FORK_REPO/actions/runs/$RUN_ID/jobs" | jq '.jobs[] | select(.conclusion == "success") | .name'
 
       - name: Check all jobs in the workflow run
         run: |
