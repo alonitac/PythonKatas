@@ -60,17 +60,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Commit and push markers.json to gh-pages
-        run: |
-          git config --local user.email "your_email@example.com"
-          git config --local user.name "Your Name"
-          touch markers.json
-          git add markers.json
-          git commit -m "Update markers.json" || echo "No changes to commit"
-          git checkout -b gh-pages || git checkout gh-pages
-          git push origin gh-pages
-
       - name: Notify user about GitHub Pages site
         run: |
-          echo "GitHub Pages site created for you! You can view it at: https://<username>.github.io/<repository>/map" >> $GITHUB_ENV
+          echo "Visit your interactive Map: " >> $GITHUB_STEP_SUMMARY
