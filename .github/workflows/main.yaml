@@ -55,6 +55,9 @@ jobs:
     runs-on: ubuntu-latest
     if: always()
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Commit and push markers.json to gh-pages
         run: |
           git config --local user.email "your_email@example.com"
