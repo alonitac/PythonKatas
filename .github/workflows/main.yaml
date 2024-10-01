@@ -8,15 +8,7 @@ on:
 #      - 'katas/**'
 
 jobs:
-  InstallDependencies:
-    runs-on: ubuntu-latest
-    steps:
-      - name: install pylint
-        run: |
-          pip install requests pytube pylint
-
   LintTest:
-    needs: InstallDependencies
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -25,18 +17,16 @@ jobs:
       - name: Linting Test
         working-directory: katas
         run: |
+          pip install pylint
           pylint *.py || true
 
-
   ListKatas:
-    needs: InstallDependencies
     runs-on: ubuntu-latest
     outputs:
       tests: ${{ steps.kata_tests.outputs.tests }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Find Katas to test
         id: kata_tests
         working-directory: katas/test
@@ -45,7 +35,7 @@ jobs:
           echo "Katas: $kata_json"
           echo "tests=$kata_json" >> $GITHUB_OUTPUT
 
-  test:
+  Test:
     needs: ListKatas
     runs-on: ubuntu-latest
     strategy:
@@ -60,3 +50,19 @@ jobs:
           cd katas
           python test/${{ matrix.kata_name }}
 
+  CreateMap:
+    needs: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Commit and push markers.json to gh-pages
+        run: |
+          git config --local user.email "your_email@example.com"
+          git config --local user.name "Your Name"
+          touch markers.json
+          git add markers.json
+          git commit -m "Update markers.json" || echo "No changes to commit"
+          git push origin gh-pages # Ensure gh-pages branch exists or create it if necessary
+
+      - name: Notify user about GitHub Pages site
+        run: |
+          echo "GitHub Pages site created for you! You can view it at: https://<username>.github.io/<repository>/map" >> $GITHUB_ENV
