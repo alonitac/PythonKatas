@@ -1,11 +1,14 @@
 {
     "type": "FeatureCollection",
+    "version": "1",
     "features": [
         {
             "type": "Feature",
             "properties": {
-                "id": "1",
-                "description": "Inside Roy's house"
+                "success": false,
+                "id": "binary_to_dec.py",
+                "name": "binary_to_dec.py",
+                "description": "binary_to_dec.py"
             },
             "geometry": {
                 "type": "Point",
@@ -18,8 +21,10 @@
         {
             "type": "Feature",
             "properties": {
-                "id": "2",
-                "description": "Inside Cabin A"
+                "success": false,
+                "id": "cache_list.py",
+                "name": "cache_list.py",
+                "description": "cache_list.py"
             },
             "geometry": {
                 "type": "Point",
@@ -32,7 +37,10 @@
         {
             "type": "Feature",
             "properties": {
-                "id": "3"
+                "success": false,
+                "id": "car.py",
+                "name": "car.py",
+                "description": "car.py"
             },
             "geometry": {
                 "type": "Point",

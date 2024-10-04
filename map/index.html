@@ -49,25 +49,33 @@
 			try {
 				const response = await fetch('markers.json');
 				const data = await response.json();
-				const katas_repo = getCookie('python_katas_repo') || 'alonitac/PythonKatas';
-				console.log(katas_repo);
-				const cached_test_results = getCookie('test_results');
-				let cached_test_results_id, cached_results;
-				if (cached_test_results) {
-			    	[cached_test_results_id, cached_results] = cached_test_results.split('_');
-				}
-				const test_results_id = await fetchTestResultsId(katas_repo);
 
+				const katas_repo = getCookie('python_katas_repo') || 'alonitac/PythonKatas';
+
+				const cached_test_results = getCookie('test_results');
+				let cached_test_results_id, markers_ver, cached_results;
+				if (cached_test_results) {
+			    	[cached_test_results_id, markers_ver, cached_results] = cached_test_results.split('#');
+				}
+
+				let results_str = '';
+				const test_results_id = await fetchTestResultsId(katas_repo);
+				console.log('test result id found in internal/test/.test_results_id ' + test_results_id);
 				if (test_results_id) {
-				  if (cached_test_results_id === test_results_id) {
-					console.log('load from coockie');
-					const results = getCookie('test_results_id');
+				  if (cached_test_results_id === test_results_id && markers_ver === data.version) {
+					console.log('load results from cookie test_results');
+					results_str = cached_results;
 				  } else {
 				    const results = await fetchWorkflowJobs(katas_repo, test_results_id);
-				    setCookie('test_results', test_results_id + '_' + results);
-				    console.log(results);
+				    results_str = data.features.map(feature => results.includes(feature.properties.id) ? '1' : '0').join('');
+					setCookie('test_results', test_results_id + '#' + data.version + '#' + results_str);
 				  }
 				}
+
+				console.log(results_str);
+				data.features.forEach((feature, index) => {
+					feature.properties.success = results_str[index] === '1';
+				});
 
 				var interactive_map = new InteractiveMap('map', {
 					max_good_zoom: 5,

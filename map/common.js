@@ -395,11 +395,6 @@ class InteractiveLayer {
 
             html.appendChild(title);
 
-            let media_html = getPopupMedia(feature, this.id);
-            if (media_html) {
-                html.appendChild(media_html);
-            }
-
             if (feature.properties.description) {
                 var description = document.createElement('p');
                 description.className = 'popup-description';
@@ -1273,39 +1268,6 @@ class Utils {
     }
 }
 
-
-function getPopupMedia(feature, list_id) {
-    var html = document.createElement('div');
-
-    const POPUP_WIDTH_16_9 = Math.min(500, window.screen.availWidth - 100, (window.screen.availHeight - 200) * 16 / 9);
-    const POPUP_WIDTH_4_3 = Math.min(500, window.screen.availWidth - 100, (window.screen.availHeight - 200) * 4 / 3);
-
-    if (feature.properties.id) {
-        var image_link = document.createElement('a');
-        image_link.href = `images/${list_id}/${feature.properties.id}.jpg`;
-
-        var image = document.createElement('img');
-        image.className = 'popup-media';
-        image.src = image_link.href;
-
-        image_link.appendChild(image);
-        html.appendChild(image_link);
-    } else if (feature.properties.video_id) {
-        var video = document.createElement('iframe');
-        video.className = 'popup-media';
-        video.width = POPUP_WIDTH_16_9;
-        video.height = POPUP_WIDTH_16_9 / 16 * 9;
-        video.src = `https://www.youtube-nocookie.com/embed/${feature.properties.video_id}`;
-        video.title = 'YouTube video player';
-        video.frameborder = 0;
-        // video.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; allowfullscreen'
-
-        html.appendChild(video);
-    }
-
-    return html;
-}
-
 /*
 
 Generate Markers
@@ -1333,7 +1295,7 @@ function getCookie(name) {
 
 
 async function fetchTestResultsId(katas_repo) {
-    const url = `https://raw.githubusercontent.com/${katas_repo}/refs/heads/internal/test/.test_results_id`;
+    const url = `https://raw.githubusercontent.com/${katas_repo}/refs/heads/internal/test/.test_results_id?cb=${Math.random()}`;
 
     try {
         const response = await fetch(url);
@@ -1366,8 +1328,8 @@ async function fetchWorkflowJobs(katas_repo, runId) {
 
             const data = await response.json();
             const results = data.jobs
-                .filter(job => job.conclusion === "success")
-                .map(job => job.name);
+                .filter(job => job.name.startsWith("test_") && job.conclusion === "success")
+                .map(job => job.name.replace(/^test_/, ''));
             allResults = allResults.concat(results);
 
             if (page * 100 >= data.total_count) {
