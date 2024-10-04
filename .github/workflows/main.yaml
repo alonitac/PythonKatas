@@ -60,10 +60,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Notify user about GitHub Pages site
-        run: |
-          echo "Visit your interactive Map: " >> $GITHUB_STEP_SUMMARY
-            - name: Commit and push markers.json to gh-pages
       - run: |
           git config --local user.email "python@katas"
           git config --local user.name "auto-test"
