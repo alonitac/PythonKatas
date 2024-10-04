@@ -47,7 +47,7 @@ jobs:
         kata_name: ${{ fromJson(needs.ListKatas.outputs.tests) }}
     steps:
       - uses: actions/checkout@v4
-      - name: Kata Test
+      - name: unittest run
         run: |
           export PYTHONPATH=$PYTHONPATH:$(pwd)
           cd katas
@@ -63,3 +63,11 @@ jobs:
       - name: Notify user about GitHub Pages site
         run: |
           echo "Visit your interactive Map: " >> $GITHUB_STEP_SUMMARY
+            - name: Commit and push markers.json to gh-pages
+      - run: |
+          git config --local user.email "python@katas"
+          git config --local user.name "auto-test"
+          git checkout -b internal/test || git checkout internal/test
+          echo ${GITHUB_RUN_ID} > .test_results_id
+          git add .test_results_id && git commit -m "update run id"
+          git push origin internal/test --force
