@@ -48,6 +48,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: unittest run
+        id: ${{ matrix.kata_name }}
         run: |
           export PYTHONPATH=$PYTHONPATH:$(pwd)
           cd katas
