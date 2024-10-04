@@ -41,6 +41,7 @@ jobs:
   Test:
     needs: ListKatas
     runs-on: ubuntu-latest
+    name: ${{ matrix.kata_name }}
     strategy:
       fail-fast: false
       matrix:

@@ -1367,7 +1367,7 @@ async function fetchWorkflowJobs(katas_repo, runId) {
             const data = await response.json();
             const results = data.jobs
                 .filter(job => job.conclusion === "success")
-                .map(() => job.name);
+                .map(job => job.name);
             allResults = allResults.concat(results);
 
             if (page * 100 >= data.total_count) {
