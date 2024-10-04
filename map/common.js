@@ -1305,3 +1305,86 @@ function getPopupMedia(feature, list_id) {
 
     return html;
 }
+
+/*
+
+Generate Markers
+
+*/
+
+
+function setCookie(name, value) {
+    var date = new Date();
+    date.setTime(date.getTime() + (30 * 24 * 60 * 60 * 1000));
+    var expires = "; expires=" + date.toUTCString();
+    document.cookie = name + "=" + (value) + expires + "; path=/";
+}
+
+function getCookie(name) {
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+}
+
+
+async function fetchTestResultsId(katas_repo) {
+    const url = `https://raw.githubusercontent.com/${katas_repo}/refs/heads/internal/test/.test_results_id`;
+
+    try {
+        const response = await fetch(url);
+        if (response.ok) {
+            const runId = await response.text();
+            return runId.trim();
+        } else {
+            console.error("Failed to fetch .test_results_id");
+        }
+    } catch (error) {
+        console.error("Error fetching .test_results_id:", error);
+    }
+    return null;
+}
+
+async function fetchWorkflowJobs(katas_repo, runId) {
+    const baseUrl = `https://api.github.com/repos/${katas_repo}/actions/runs/${runId}/jobs`;
+    let allResults = [];
+    let page = 1;
+
+    try {
+        while (true) {
+            const url = `${baseUrl}?per_page=100&page=${page}`;
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                console.error("Failed to fetch workflow jobs");
+                break;
+            }
+
+            const data = await response.json();
+            const results = data.jobs
+                .filter(job => job.conclusion === "success")
+                .map(() => job.name);
+            allResults = allResults.concat(results);
+
+            if (page * 100 >= data.total_count) {
+                break;
+            }
+
+            page++;
+        }
+        return allResults;
+    } catch (error) {
+        console.error("Error fetching workflow jobs:", error);
+    }
+
+    return [];
+}
+
+
+
+
+
