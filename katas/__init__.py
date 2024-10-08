@@ -77,7 +77,6 @@ katas = [
     'book_your_seat.py'                 # is None
     'boarding_pass_code.py'             # f string
     'process_payment.py'                # type() or isinstance(): multiple input type for an argument
-    
     'lets_vote.py'                      # increase counter in dict (add if not exist)
     'in_the_club.py'                    # check if key exist in dict
     'top_student.py'                    # lambda introduced
@@ -89,15 +88,24 @@ katas = [
     'dicts_in_order.py'                 # list of tuples from dict
     'they_legit.py'                     # list of dict, lambda functions
     
-    'do_twice.py'                       # lambda functions
-    'list_rotation.py'                  # list rotation
     'count_even_numbers.py'             # return terminates the function (bug)
+    'do_twice.py'                       # pointer to function
+    'list_rotation.py'                  # list rotation
     'time_me.py'                        # import time
+    'monotonic_array.py'                
+    'prime_num.py'
+    'seven_boom.py'
+    'strong_pass.py'                    # re 
+    'merge_sorted_lists.py'             # sort and sorted
+    'best_student.py'
+    'pair_match.py'
+    'merge_dict.py'                     # merge dicts
 
     ''  # toward binary search
     ''  # add if not exists (list and dict) (set)
-
 ]
+
+"""
 fix_me.py
 knapsack.py
 tasks_scheduling.py
@@ -105,21 +113,13 @@ pascal_triangle.py
 youtube.py
 bash.py
 count_vowels.py
-bad_average.py
 to_lower_case.py
 complete_me.py
 sum_of_elements.py
 words_concat.py
-monotonic_array.py
-palindrome.py
-prime_num.py
-seven_boom.py
-strong_pass.py
-merge_sorted_lists.py
-best_student.py
-pair_match.py
-merge_dict.py
+
 summer.py
+
 files_backup.py
 most_frequent_name.py
 replace_in_file.py
@@ -164,3 +164,4 @@ ansible_dynamic_inv.py
 queue_with_failover.py
 unittesting.py
 singleton.py
+"""
