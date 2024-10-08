@@ -95,4 +95,4 @@ _Kata_ is a Japanese word (型 or 形) meaning "form". It refers to a detailed c
 - [ ] `boarding_pass_code.py`
 - [ ] `process_payment.py`
 
-[ff](../../map/index.html)
+[ff](./map/index.html)
