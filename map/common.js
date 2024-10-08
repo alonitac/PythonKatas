@@ -1299,5 +1299,85 @@ async function fetchWorkflowJobs(katas_repo, runId) {
 
 
 
+function triggerFireworks() {
+    var duration = 7 * 1000;
+    var end = Date.now() + duration;
+
+    (function frame() {
+        confetti({
+            particleCount: 15,
+            startVelocity: 20,
+            spread: 360,
+            origin: { x: 0.5, y: 0 }, // center of the screen
+            zIndex: 9999
+        });
+
+        if (Date.now() < end) {
+            requestAnimationFrame(frame);
+        }
+    }());
+}
 
 
+async function init() {
+    const response = await fetch('markers.json');
+    const data = await response.json();
+
+    const katas_repo = getCookie('python_katas_repo') || 'alonitac/PythonKatas';
+
+    const cached_test_results = getCookie('test_results');
+    let cached_test_results_id, markers_ver, cached_results;
+    if (cached_test_results) {
+        [cached_test_results_id, markers_ver, cached_results] = cached_test_results.split('#');
+    }
+
+    let results_str = '';
+    const test_results_id = await fetchTestResultsId(katas_repo);
+    if (test_results_id) {
+      console.log('test result id found in internal/test/.test_results_id ' + test_results_id);
+
+      if (cached_test_results_id === test_results_id && markers_ver === data.version) {
+        results_str = cached_results;
+      } else {
+        const results = await fetchWorkflowJobs(katas_repo, test_results_id);
+        results_str = data.features.map(feature => results.includes(feature.properties.id) ? '1' : '0').join('');
+        setCookie('test_results', test_results_id + '#' + data.version + '#' + results_str);
+      }
+    }
+
+    data.features.forEach((feature, index) => {
+        feature.properties.completed = results_str[index] === '1';
+    });
+
+    var interactive_map = new InteractiveMap('map', {
+        max_good_zoom: 5,
+        max_map_zoom: 7,
+        website_source: 'https://github.com/interactive-game-maps/kona',
+        website_subdir: 'kona'
+    });
+
+    interactive_map.addTileLayer('Ingame map', {
+        minNativeZoom: 2,
+        maxNativeZoom: 5,
+    });
+
+    interactive_map.addInteractiveLayer('markers', data, {
+        name: "Python Katas",
+        create_checkbox: true,
+        create_feature_popup: true,
+        sidebar_icon_html: '<i class="fab fa-python"></i>',
+        pointToLayer: function (feature, latlng) {
+            return L.marker(latlng, {
+                icon: Utils.getCustomIcon('fa-brands', feature.properties.completed),
+                riseOnHover: true
+            });
+        }
+    });
+    interactive_map.finalize();
+
+    if (data.features.every(feature => feature.properties.completed === true)) {
+        triggerFireworks();
+    }
+}
+
+init();
