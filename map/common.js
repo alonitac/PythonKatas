@@ -143,8 +143,9 @@ class InteractiveLayer {
         var geojson_layer = L.geoJSON(geojson, {
             pointToLayer: params.pointToLayer.bind(this),
             onEachFeature: (feature, layer) => {
+                const featureIndex = geojson.features.indexOf(feature);
                 if (this.#create_checkbox) {
-                    this.#createSidebarCheckbox(feature);
+                    this.#createSidebarCheckbox(feature, featureIndex);
                 }
 
                 if (params.create_feature_popup) {
@@ -473,7 +474,7 @@ class InteractiveLayer {
      * Create a sidebar checkbox for a feature if it doesn't already exist.
      * @param {object} feature Original feature object
      */
-    #createSidebarCheckbox(feature) {
+    #createSidebarCheckbox(feature, featureIndex) {
         if (!document.getElementById(this.id + ':' + feature.properties.id)) {
             var list_entry = document.createElement('li');
             list_entry.className = 'flex-grow-1';
@@ -487,40 +488,31 @@ class InteractiveLayer {
             checkbox.id = this.id + ':' + feature.properties.id;
             checkbox.className = 'flex-grow-0';
 
-            var label = document.createElement('label')
-            label.appendChild(document.createTextNode(feature.properties.id + ' '));
+            var label = document.createElement('label');
+
+            let completedIcon = feature.properties.completed ? '✅' : '❌';
+            var leftSpan = document.createElement('span');
+            leftSpan.appendChild(document.createTextNode((featureIndex + 1) + '. ' + feature.properties.id + ' ' + completedIcon));
+            leftSpan.style.fontWeight = 'bold';
+
+            var rightSpan = document.createElement('span');
+            rightSpan.appendChild(document.createTextNode('(' + feature.properties.description + ')'));
+
+            label.style.display = 'flex';
+            label.style.justifyContent = 'space-between';
+            label.style.width = '100%';
+
+            label.appendChild(leftSpan);
+            label.appendChild(rightSpan);
             label.htmlFor = checkbox.id;
             label.className = 'flex-grow-1';
 
             var icon = document.createElement('i');
             icon.className = 'fas fa-crosshairs fa-xs';
 
-            var locate_button = document.createElement('button');
-            locate_button.innerHTML = icon.outerHTML;
-            locate_button.addEventListener('click', () => {
-                // Close sidebar if it spans over the complete view
-                if (window.matchMedia('(max-device-width: 767px)').matches) {
-                    this.#sidebar.close();
-                }
-
-                // rewrite url for easy copy pasta
-                Utils.setHistoryState(this.id, feature.properties.id);
-
-                this.#interactive_map.removeAllHighlights();
-                this.highlightFeature(feature.properties.id);
-                this.zoomToFeature(feature.properties.id);
-
-                // tmp disable after button click
-                list_entry.removeEventListener('mouseleave', leave_function);
-                window.setTimeout(() => {
-                    list_entry.addEventListener('mouseleave', leave_function);
-                }, 3000);
-            });
-            locate_button.className = 'flex-grow-0';
-
             list_entry.appendChild(checkbox);
             list_entry.appendChild(label);
-            list_entry.appendChild(locate_button);
+
             this.#sidebar_list_html.appendChild(list_entry);
 
             // hide if checked previously
@@ -1181,59 +1173,18 @@ class Utils {
      * @param {string} [icon_mode=undefined] The ID for the background variation that can be found in `images/icons/marker_ID.svg`. Can be undefined for the default icon background.
      * @returns L.divIcon
      */
-    static getCustomIcon(icon_id = undefined, icon_mode = undefined) {
-        var background_path = icon_mode ? `images/icons/marker_${icon_mode}.svg` : "marker.svg";
-
-        if (!icon_id) {
-            return L.divIcon({
-                className: 'map-marker',
-                html: `
-            <img class="map-marker-background" src="${background_path}" />
-            `,
-                iconSize: [25, 41],
-                popupAnchor: [1, -34],
-                iconAnchor: [12, 41],
-                tooltipAnchor: [0, 0]
-            });
-        }
-
-        if (icon_id.startsWith('fa-')) {
-            return L.divIcon({
-                className: 'map-marker',
-                html: `
-            <img class="map-marker-background" src="${background_path}" />
-            <div class="map-marker-foreground-wrapper"><i class="fas ${icon_id} map-marker-foreground"></i></div>
-            `,
-                iconSize: [25, 41],
-                popupAnchor: [1, -34],
-                iconAnchor: [12, 41],
-                tooltipAnchor: [0, 0]
-            });
-        } else if (icon_id.length > 2) {
-            return L.divIcon({
-                className: 'map-marker',
-                html: `
-                <img class="map-marker-background" src="${background_path}" />
-                <div class="map-marker-foreground-wrapper"><img class='map-marker-foreground' src='images/icons/${icon_id}.png' /></div>
-                `,
-                iconSize: [25, 41],
-                popupAnchor: [1, -34],
-                iconAnchor: [12, 41],
-                tooltipAnchor: [0, 0]
-            });
-        } else if (icon_id.length < 3) {
-            return L.divIcon({
-                className: 'map-marker',
-                html: `
-            <img class="map-marker-background" src="${background_path}" />
-            <div class="map-marker-foreground-wrapper"><p class="map-marker-foreground">${icon_id}</p></div>
-            `,
-                iconSize: [25, 41],
-                popupAnchor: [1, -34],
-                iconAnchor: [12, 41],
-                tooltipAnchor: [0, 0]
-            });
-        }
+    static getCustomIcon(icon_id = undefined, completed = false) {
+        var foregroundColor = completed ? '#FFAF00' : '#FF204E';
+        return L.divIcon({
+            className: 'map-marker',
+            html: `
+            <svg xmlns="http://www.w3.org/2000/svg" height="24" width="15" viewBox="0 0 320 512"><path fill="${foregroundColor}" d="M16 144a144 144 0 1 1 288 0A144 144 0 1 1 16 144zM160 80c8.8 0 16-7.2 16-16s-7.2-16-16-16c-53 0-96 43-96 96c0 8.8 7.2 16 16 16s16-7.2 16-16c0-35.3 28.7-64 64-64zM128 480l0-162.9c10.4 1.9 21.1 2.9 32 2.9s21.6-1 32-2.9L192 480c0 17.7-14.3 32-32 32s-32-14.3-32-32z"/></svg>
+        `,
+            iconSize: [19, 14],
+            popupAnchor: [1, -34],
+            iconAnchor: [12, 41],
+            tooltipAnchor: [0, 0]
+        });
     }
 
     /**

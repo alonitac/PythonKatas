@@ -154,9 +154,10 @@ html, body, #map {
     top: 0px;
 }
 
-.leaflet-sidebar-content {
-    scrollbar-width: none;
+.leaflet-sidebar-content #markers {
+    padding-left: 0px;
 }
+
 
 /* || Highlight marker
     https://cssdeck.com/labs/tedyvui4
