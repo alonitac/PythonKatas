@@ -1,9 +1,8 @@
 import katas
 import json
-import math
 
-with open('docs/markers.json') as f:
-    coords = [m['geometry']['coordinates'] for m in json.load(f)['features'] if m['geometry']['type'] == 'Point']
+with open('docs/markers_master.json') as f:
+    markers_master = json.load(f)
 
 markers = {
     "version": "4",
@@ -11,26 +10,30 @@ markers = {
     "features": []
 }
 
-# s = math.ceil(len(katas.katas) / len(coords))
-# c_i = 0
+for f in markers_master['features']:
+    section = katas.katas[f['properties']['_id']]
+    if f['geometry']['type'] == 'Point':
+        f['properties']['katas'] = section['katas']
+        markers['features'].append(f)
 
-for i, (f, d) in enumerate(katas.katas):
-    if len(coords) == i:
-        break
-    markers['features'].append({
-            "type": "Feature",
-            "properties": {
-                "id": f,
-                "name": f,
-                "description": d
-            },
-            "geometry": {
-                "type": "Point",
-                "coordinates": coords[i]
-            }
-    })
-    # if (i + 1) % s == 0:
-    #     c_i += 1
+    elif f['geometry']['type'] == 'LineString':
+        steps = min(section['steps'], len(section['katas']))
+        step = len(f['geometry']['coordinates']) / steps
+        coords_idx = [round(i * step) for i in range(steps)][:-1] + [-1]  # is any case, take the last element
+
+        for i in coords_idx:
+            markers['features'].append({
+                "type": "Feature",
+                "properties": {
+                    "id": f['properties']['_id'] + '_' + str(i),
+                    "step": i,
+                    "icon_class": section['icon_class']
+                },
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": f['geometry']['coordinates'][i]
+                }
+            })
 
 
 with open('docs/markers.json', 'w') as f:
