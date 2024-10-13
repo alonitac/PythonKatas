@@ -97,4 +97,4 @@ _Kata_ is a Japanese word (型 or 形) meaning "form". It refers to a detailed c
 
 
 
-[](./index.html)
+[ff](./index.html)
