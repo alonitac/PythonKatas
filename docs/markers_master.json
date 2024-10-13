@@ -1683,7 +1683,8 @@
         "type": "mcq",
         "_id": "mcq1",
         "id": "mcq1",
-        "icon_element": "<i class='fa-solid fa-question' style='font-size: 17px; color: #000000'></i>"
+        "iframe_url": "https://exit-zero-academy.github.io/DevOpsTheHardWayAssets/multichoice-questions/python_variables.html",
+        "icon_element": "</i><i class='far fa-check-circle' style='font-size: 17px; color: #CB6040'></i>"
       },
       "geometry": {
         "type": "Point",
@@ -1699,7 +1700,8 @@
         "type": "mcq",
         "_id": "mcq2",
         "id": "mcq2",
-        "icon_element": "<i class='fa-solid fa-question' style='font-size: 17px; color: #000000'></i>"
+        "iframe_url": "https://exit-zero-academy.github.io/DevOpsTheHardWayAssets/multichoice-questions/python_variables.html",
+        "icon_element": "<i class='far fa-check-circle' style='font-size: 17px; color: #CB6040'></i>"
       },
       "geometry": {
         "type": "Point",
@@ -1715,7 +1717,8 @@
         "type": "mcq",
         "_id": "mcq3",
         "id": "mcq3",
-        "icon_element": "<i class='fa-solid fa-question' style='font-size: 17px; color: #000000'></i>"
+        "iframe_url": "https://exit-zero-academy.github.io/DevOpsTheHardWayAssets/multichoice-questions/python_variables.html",
+        "icon_element": "<i class='far fa-check-circle' style='font-size: 17px; color: #CB6040'></i>"
       },
       "geometry": {
         "type": "Point",
@@ -1729,25 +1732,10 @@
       "type": "Feature",
       "properties": {
         "type": "mcq",
-        "_id": "mcq4",
-        "id": "mcq4",
-        "icon_element": "<i class='fa-solid fa-question' style='font-size: 17px; color: #000000'></i>"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          109,
-          -50.25
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "type": "mcq",
         "_id": "mcq5",
         "id": "mcq5",
-        "icon_element": "<i class='fa-solid fa-question' style='font-size: 17px; color: #000000'></i>"
+        "iframe_url": "https://exit-zero-academy.github.io/DevOpsTheHardWayAssets/multichoice-questions/python_variables.html",
+        "icon_element": "<i class='far fa-check-circle' style='font-size: 17px; color: #CB6040'></i>"
       },
       "geometry": {
         "type": "Point",
@@ -1763,7 +1751,8 @@
         "type": "mcq",
         "_id": "mcq6",
         "id": "mcq6",
-        "icon_element": "<i class='fa-solid fa-question' style='font-size: 17px; color: #000000'></i>"
+        "iframe_url": "https://exit-zero-academy.github.io/DevOpsTheHardWayAssets/multichoice-questions/python_variables.html",
+        "icon_element": "<i class='far fa-check-circle' style='font-size: 17px; color: #CB6040'></i>"
       },
       "geometry": {
         "type": "Point",
@@ -1779,7 +1768,8 @@
         "type": "mcq",
         "_id": "mcq7",
         "id": "mcq7",
-        "icon_element": "<i class='fa-solid fa-question' style='font-size: 17px; color: #000000'></i>"
+        "iframe_url": "https://exit-zero-academy.github.io/DevOpsTheHardWayAssets/multichoice-questions/python_variables.html",
+        "icon_element": "<i class='far fa-check-circle' style='font-size: 17px; color: #CB6040'></i>"
       },
       "geometry": {
         "type": "Point",

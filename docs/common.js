@@ -390,31 +390,40 @@ class InteractiveLayer {
             html.className = 'popup-id';
             html.id = `popup:${this.id}:${feature.properties.id}`;
 
-            var title = document.createElement('h2');
-            title.className = 'popup-title';
-            title.innerHTML = feature.properties.name ? feature.properties.name : feature.properties.id;
+            if (feature.properties.iframe_url) {
+                var iframe = document.createElement('iframe');
+                iframe.src = feature.properties.iframe_url;
+                iframe.width = "600px";
+                iframe.height = "600px";
+                iframe.setAttribute('frameborder', '0');
+                iframe.setAttribute('allowfullscreen', 'true');
 
-            html.appendChild(title);
+                html.appendChild(iframe);
+            } else {
+                var title = document.createElement('h2');
+                title.className = 'popup-title';
+                title.innerHTML = feature.properties.name ? feature.properties.name : feature.properties.id;
 
-            if (feature.properties.description) {
-                var description = document.createElement('p');
-                description.className = 'popup-description';
-                var span = document.createElement('span');
-                span.setAttribute('style', 'white-space: pre-wrap');
-                span.appendChild(document.createTextNode(feature.properties.description));
-                description.appendChild(span);
+                html.appendChild(title);
 
-                html.appendChild(description);
+                if (feature.properties.description) {
+                    var description = document.createElement('p');
+                    description.className = 'popup-description';
+                    var span = document.createElement('span');
+                    span.setAttribute('style', 'white-space: pre-wrap');
+                    span.appendChild(document.createTextNode(feature.properties.description));
+                    description.appendChild(span);
+
+                    html.appendChild(description);
+                }
             }
+
             return html;
         }.bind(this);
 
-        layer.bindPopup(content, { maxWidth: "auto"  });
+        layer.bindPopup(content, { maxWidth: "auto", closeOnClick: true });
 
         layer.on('popupopen', event => {
-//            this.#interactive_map.getShareMarker().removeMarker();
-            Utils.setHistoryState(this.id, feature.properties.id);
-
             // Listen for size changes and update when it does
             for (const entry of document.getElementById(`popup:${this.id}:${feature.properties.id}`).getElementsByClassName('popup-media')) {
                 this.#resize_observer.observe(entry);
@@ -422,8 +431,6 @@ class InteractiveLayer {
         }, this);
 
         layer.on('popupclose', event => {
-//            this.#interactive_map.getShareMarker().prevent();
-            Utils.setHistoryState(undefined, undefined, this.#website_subdir);
             this.#resize_observer.disconnect();
         }, this);
     }
@@ -715,7 +722,6 @@ class InteractiveMap {
     #overlay_maps = new Object();
     #sidebar;
     #tile_layers = new Object();
-    #user_layers;
     #website_subdir = '';
 
     /**
@@ -753,18 +759,6 @@ class InteractiveMap {
 
         this.#setUpToolbar();
         this.#setUpSidebar(params.attribution, params.website_source, this.#website_subdir);
-
-        this.#user_layers = JSON.parse(localStorage.getItem(`${this.#website_subdir}:user_layers`));
-        this.#map.on('overlayadd', event => {
-            this.addUserLayer(event.name);
-        });
-        this.#map.on('overlayremove ', event => {
-            this.removeUserLayer(event.name);
-
-            if (this.hasLayer(this.#getLayerByName(event.name))) {
-                this.#getLayerByName(event.name).removeAllHighlights();
-            }
-        });
     }
 
     addTileLayer(name, args, url = `https://exit-zero-academy.github.io/DevOpsTheHardWayAssets/python_katas_map/tiles/{z}/{x}/{y}.png`) {
@@ -789,19 +783,9 @@ class InteractiveMap {
 
     addInteractiveLayer(id, geojson, args) {
         let layer = new InteractiveLayer(id, geojson, this, args);
-
         this.#interactive_layers.set(layer.id, layer);
-
         return layer;
     }
-
-    addUserLayer(name) {
-        if (!this.#user_layers.includes(name)) {
-            this.#user_layers.push(name);
-        }
-        localStorage.setItem(`${this.#website_subdir}:user_layers`, JSON.stringify(this.#user_layers));
-    }
-
 
     /**
      * Finalize the interactive map. Call this after adding all layers to the map.
@@ -822,91 +806,18 @@ class InteractiveMap {
             hideSingleBase: true
         }).addTo(this.#map);
 
-        // Show remembered layers
-        if (!this.#user_layers) {
-            this.#user_layers = new Array();
-            this.getLayers().forEach((layer, id) => {
-                if (layer.isDefault()) {
-                    this.#user_layers.push(layer.name);
-                }
-            });
-        }
         this.getLayers().forEach((layer, id) => {
-            if (this.#user_layers.includes(layer.name)) {
-                layer.show();
-            }
+            layer.show();
         });
 
         // Center view over map
         this.zoomToBounds(this.#getBounds());
-
-        // hide all previously checked marker
-        this.getLayers().forEach((layer, layer_id) => {
-            layer.getAllLayers().forEach((array, feature_id) => {
-                // Remove if checked
-                if (localStorage.getItem(`${this.#website_subdir}:${layer_id}:${feature_id}`)) {
-                    array.forEach(feature => {
-                        layer.removeLayer(feature);
-                    });
-                }
-            });
-        });
-
-        // Search in url for marker and locate them
-        const queryString = window.location.search;
-        const urlParams = new URLSearchParams(queryString);
-        if (urlParams.has('share')) {
-            const share = urlParams.get('share');
-
-            let latlng = share.split(",");
-        } else if (urlParams.has('list')) {
-            const list = urlParams.get('list');
-
-            if (this.hasLayer(list)) {
-                var layer = this.getLayer(list);;
-
-                // make group visible
-                layer.show();
-
-                if (!urlParams.has('id')) {
-                    layer.zoomTo();
-
-                    // if no id open sidebar
-                    this.#sidebar._tabitems.every(element => {
-                        if (element._id == list) {
-                            this.#sidebar.open(list);
-                            return false;
-                        }
-                        return true;
-                    });
-                } else {
-                    const id = urlParams.get('id');
-
-                    if (layer.hasFeature(id)) {
-                        layer.highlightFeature(id);
-                        layer.zoomToFeature(id);
-                        this.#map.on('click', this.removeAllHighlights, this);
-                    }
-
-                    // TODO: unhide?
-                }
-            }
-        }
     }
 
-    /**
-     * Get the parent marker cluster. Might not be used at all.
-     * @returns L.MarkerClusterGroup
-     */
     getClusterGroup() {
         return this.#cluster_group;
     }
 
-    /**
-     * Get the layer with a specific ID.
-     * @param {string} id Layer ID
-     * @returns InteractiveLayer
-     */
     getLayer(id) {
         if (!this.#interactive_layers.has(id)) {
             return undefined;
@@ -915,51 +826,26 @@ class InteractiveMap {
         return this.#interactive_layers.get(id);
     }
 
-    /**
-     * Get all layers this interactive map is aware of.
-     * @returns Map<id, layer>
-     */
     getLayers() {
         return this.#interactive_layers;
     }
 
-    /**
-     * Get the leaflet map.
-     * @returns L.Map
-     */
     getMap() {
         return this.#map;
     }
 
-    /**
-     * Get the maximum good looking zoom value.
-     * @returns integer
-     */
     getMaxZoom() {
         return this.MAX_ZOOM;
     }
 
-    /**
-     * Get the sidebar associated to this interactive map.
-     * @returns L.Control.Sidebar
-     */
     getSidebar() {
         return this.#sidebar;
     }
 
-    /**
-     * Get the subdirectory this interactive map is associated to.
-     * @returns string
-     */
     getWebsiteSubdir() {
         return this.#website_subdir;
     }
 
-    /**
-     * Check if this interactive map has a specific layer group.
-     * @param {string} id Layer group ID
-     * @returns boolean
-     */
     hasLayer(id) {
         return this.#interactive_layers.has(id);
     }
@@ -974,33 +860,12 @@ class InteractiveMap {
         this.#map.off('click', this.removeAllHighlights, this);
     }
 
-    /**
-     * Remove a layer from the remembered user preferences.
-     * @param {string} name ID of the layer
-     */
-    removeUserLayer(name) {
-        this.#user_layers = this.#user_layers.filter((value, index, array) => {
-            return value != name;
-        });
-        localStorage.setItem(`${this.#website_subdir}:user_layers`, JSON.stringify(this.#user_layers));
-    }
-
-    /**
-     * Zoom to given bounds on this interactive map.
-     * @param {L.LatLngBounds | L.LatLng[] | L.Point[] | Array[]} bounds Bounds to zoom to. Can be an array of points.
-     */
     zoomToBounds(bounds) {
         this.#map.fitBounds(bounds, {
             maxZoom: this.MAX_ZOOM
         });
     }
 
-    /**
-     * Initialize the sidebar.
-     * @param {string} attribution General attribution list about used stuff
-     * @param {string} website Where to find the source of this interactive map
-     * @param {string} website_subdir Subdir this interactive map will be hosted in
-     */
     #setUpSidebar(attribution, website, website_subdir) {
         this.#sidebar = L.control.sidebar({
             autopan: true,
@@ -1010,7 +875,17 @@ class InteractiveMap {
         }).addTo(this.#map);
 
         this.#sidebar.addPanel({
-            id: 'edit',
+            id: 'reload',
+            tab: '<i class="fas fa-sync-alt"></i>',
+            title: 'Reload map',
+            position: 'bottom',
+            button: () => {
+
+            }
+        });
+
+        this.#sidebar.addPanel({
+            id: 'github',
             tab: '<i class="fab fa-github"></i>',
             title: 'Change tracking repo',
             position: 'bottom',
@@ -1023,15 +898,10 @@ class InteractiveMap {
 
         // make group visible on pane opening
         this.#sidebar.on('content', event => {
-            if (event.id == 'attributions') return;
-
             this.#map.addLayer(this.#interactive_layers.get(event.id).getGroup());
-            Utils.setHistoryState(event.id);
         });
 
-        this.#sidebar.on('closing', () => {
-            Utils.setHistoryState(undefined, undefined, this.#website_subdir);
-        })
+
     }
 
     /**
@@ -1048,10 +918,7 @@ class InteractiveMap {
         this.#map.pm.toggleControls(); // hide by default
     }
 
-    /**
-     * Get the outer bounds of all layers on a map, including currently hidden layers.
-     * @returns L.LatLngBounds
-     */
+
     #getBounds() {
         var bounds = L.latLngBounds();
 
@@ -1062,11 +929,6 @@ class InteractiveMap {
         return bounds;
     }
 
-    /**
-     * Get a layer by its name.
-     * @param {string} name Layer name
-     * @returns L.Layer
-     */
     #getLayerByName(name) {
         var interactive_layer = undefined;
         this.#interactive_layers.forEach((layer, id) => {
@@ -1081,18 +943,10 @@ class InteractiveMap {
 
 
 /*
-
 Utils
-
 */
 
 class Utils {
-    /**
-     * Get an icon with a background variation and a centered symbol/icon/short string/nothing on top.
-     * @param {string} [icon_id=undefined] The ID for the icon that can be found in `images/icons/ID.png` (length > 2). Can also be a Font Awesome ID (fa-ID), a text (length <= 2) or undefined.
-     * @param {string} [icon_mode=undefined] The ID for the background variation that can be found in `images/icons/marker_ID.svg`. Can be undefined for the default icon background.
-     * @returns L.divIcon
-     */
     static getCustomIcon(feature) {
         var colorClass = feature.properties.current ? 'current' : (feature.properties.achieved ? 'achieved' : 'noncurrent')
         var marker_html = feature.properties.type != 'destination' ? feature.properties.icon_element
@@ -1109,43 +963,10 @@ class Utils {
             tooltipAnchor: [0, 0]
         });
     }
-
-    /**
-     * Replace the current browser address bar.
-     * If only `website_subdir` is given it will reset to that url
-     * @param {string} [list_id=undefined] Group ID
-     * @param {string} [feature_id=undefined] Feature ID
-     * @param {string} [website_subdir=''] Resets to plain url
-     */
-    static setHistoryState(list_id = undefined, feature_id = undefined, website_subdir = '') {
-        if (list_id && feature_id) {
-            history.replaceState({}, "", `?list=${list_id}&id=${feature_id}`);
-        } else if (list_id) {
-            history.replaceState({}, "", `?list=${list_id}`);
-        } else {
-            // CORS is driving me crazy
-            // https://stackoverflow.com/a/3920899
-            switch (window.location.protocol) {
-                case 'http:':
-                case 'https:':
-                    //remote file over http or https
-                    history.replaceState({}, "", `/${website_subdir}/`);
-                    break;
-                case 'file:':
-                    //local file
-                    history.replaceState({}, "", `index.html`);
-                    break;
-                default:
-                //some other protocol
-            }
-        }
-    }
 }
 
 /*
-
 Generate Markers
-
 */
 
 
