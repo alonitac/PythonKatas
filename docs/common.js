@@ -748,7 +748,7 @@ class InteractiveMap {
         this.#map = L.map(id, {
             crs: L.CRS.Simple,
             maxZoom: params.max_map_zoom,
-        });;
+        });
         this.MAX_ZOOM = params.max_good_zoom;
         this.#website_subdir = params.website_subdir;
 
@@ -757,8 +757,13 @@ class InteractiveMap {
             maxClusterRadius: params.maxClusterRadius
         }).addTo(this.#map);
 
-        this.#setUpToolbar();
         this.#setUpSidebar(params.attribution, params.website_source, this.#website_subdir);
+    }
+
+    removeMap() {
+        this.#map.removeLayer(this.#cluster_group);
+        this.#map.removeControl(this.#sidebar);
+        this.#map.remove();
     }
 
     addTileLayer(name, args, url = `https://exit-zero-academy.github.io/DevOpsTheHardWayAssets/python_katas_map/tiles/{z}/{x}/{y}.png`) {
@@ -787,9 +792,6 @@ class InteractiveMap {
         return layer;
     }
 
-    /**
-     * Finalize the interactive map. Call this after adding all layers to the map.
-     */
     finalize() {
         // Set the column size for each interactive layer sidebar
         this.getLayers().forEach((layer, id) => {
@@ -880,7 +882,7 @@ class InteractiveMap {
             title: 'Reload map',
             position: 'bottom',
             button: () => {
-
+                init(true);
             }
         });
 
@@ -903,21 +905,6 @@ class InteractiveMap {
 
 
     }
-
-    /**
-     * Initialize the editing toolbar.
-     */
-    #setUpToolbar() {
-        // Disable general editing
-        L.PM.setOptIn(true);
-        this.#map.pm.addControls({
-            position: 'bottomright',
-            drawCircleMarker: false,
-            oneBlock: false
-        });
-        this.#map.pm.toggleControls(); // hide by default
-    }
-
 
     #getBounds() {
         var bounds = L.latLngBounds();
@@ -1082,7 +1069,8 @@ document.getElementById('submitRepo').onclick = function() {
 };
 
 
-async function init() {
+let interactive_map;
+async function init(reload = false) {
 
     const response = await fetch('markers.json');
     const data = await response.json();
@@ -1111,7 +1099,7 @@ async function init() {
               .map(f => f.properties.katas.map(kata => kata[0]))
               .map(katas => katas.map(kata => current_test_results.includes(kata) ? '1' : '0').join('')).join('_');
 
-            setCookie('python_katas', katas_repo + '#' + test_results_id + '#' + data.version + '#' + results_str);
+            setCookie('python_katas', katas_repo + '#' + current_test_results_id + '#' + data.version + '#' + results_str);
           }
         }
     }
@@ -1157,7 +1145,11 @@ async function init() {
     data.features.push(player);
     current_feature.properties.current = true;
 
-    var interactive_map = new InteractiveMap('map', {
+    if (interactive_map) {
+        interactive_map.removeMap();
+    }
+
+    interactive_map = new InteractiveMap('map', {
         max_good_zoom: 5,
         max_map_zoom: 7,
         website_subdir: 'PythonKatas'
@@ -1180,6 +1172,7 @@ async function init() {
             });
         }
     });
+
     interactive_map.finalize();
 
     if (data.features.filter(feature => feature.properties.type === 'destination').every(feature => feature.properties.achieved === true)) {
