@@ -6,11 +6,9 @@ class InteractiveLayer {
     #ignore_next_resize = new Set(); // set of entries to skip initial resize call
     #feature_group;
     #geojsons = new Array();
-    #highlighted_layers = new Array();
     #interactive_map;
     #is_default;
     #layers = new Map();
-    #polygon_style_highlights = new Map();
     #resize_observer = new ResizeObserver(entries => {
         for (const entry of entries) {
             let feature_id = entry.target.closest('.popup-id').id.split(':')[2];
@@ -51,35 +49,10 @@ class InteractiveLayer {
             riseOnHover: true
         });
     };
-    #default_polygon_style = function (feature) { return {}; };
-    #default_polygon_style_highlight = function () {
-        return {
-            opacity: 1.0,
-            fillOpacity: 0.7
-        }
-    };
     #default_sidebar_icon_html = function () {
         return `<img class="sidebar-image" src="images/icons/${this.id}.png" />`;
     };
 
-    /**
-     * A layer containing marker and polygons created from geoJSON features.
-     * Multiple features can form a logical combined feature by having the same feature ID.
-     * @param {string} id Unique layer id
-     * @param {string} geojson geoJSON including features to add to the layer
-     * @param {InteractiveMap} interactive_map Interactive map
-     * @param {object} [args] Object containing various optional arguments
-     * @param {string} [args.name=this.id] Human readable display name of the layer. Default: `this.id`
-     * @param {boolean} [args.create_checkbox=false] Create a sidebar with a trackable list. Default: false
-     * @param {boolean} [args.create_feature_popup=false] Create a popup for the first batch of geoJSON features. Default: false
-     * @param {boolean} [args.is_default=false] Show this layer by default if a user visits the map for the first time. Default: false
-     * @param {string | function} [args.sidebar_icon_html=function () { return `<img class="sidebar-image" src="images/icons/${this.id}.png" />`; }] A html string for the sidebar icon. Can be a function which returns a html string. The function has access to values of this layer e.g. the `this.id`.
-     * @param {function} [args.onEachFeature=function (feature, layer) { }] A function with stuff to do on each feature. Has access to values of this layer e.g. `this.id`. Default: `function (feature, layer) { }`
-     * @param {function} [args.pointToLayer=function (feature, latlng) { return L.marker(latlng, { icon: Utils.getCustomIcon(this.id), riseOnHover: true }); }] A function describing what to do when putting a geoJSON point to a layer.
-     * @param {object | function} [args.polygon_style=function (feature) { return {}; }] An object or function returning an object with L.Path options. https://leafletjs.com/reference.html#path
-     * @param {object | function} [args.polygon_style_highlight=function () { return { opacity: 1.0, fillOpacity: 0.7 }}] An object or function returning an object with L.Path options. https://leafletjs.com/reference.html#path
-     * @param {L.LayerGroup} [args.feature_group=L.featureGroup.subGroup(this.#interactive_map.getClusterGroup())] The group all geoJson features get added to. Defaults to the default marker cluster.
-     */
     constructor(id, geojson, interactive_map, args) {
         let defaults = {
             name: id,
@@ -89,8 +62,6 @@ class InteractiveLayer {
             sidebar_icon_html: this.#default_sidebar_icon_html,
             pointToLayer: this.#default_pointToLayer,
             onEachFeature: this.#default_onEachFeature,
-            polygon_style: this.#default_polygon_style,
-            polygon_style_highlight: this.#default_polygon_style_highlight
         };
 
         let params = { ...defaults, ...args };
@@ -113,28 +84,14 @@ class InteractiveLayer {
             create_feature_popup: params.create_feature_popup,
             pointToLayer: params.pointToLayer,
             onEachFeature: params.onEachFeature,
-            polygon_style: params.polygon_style,
-            polygon_style_highlight: params.polygon_style_highlight
         });
     }
 
-    /**
-     * Add another geoJSON to this layer group.
-     * @param {string} geojson geoJSON containing the features to add
-     * @param {object} [args] Optional arguments
-     * @param {boolean} [args.create_feature_popup=false] Create a popup for each feature
-     * @param {function} [args.onEachFeature=function (feature, layer) { }] A function with stuff to do on each feature. Has access to values of this layer e.g. `this.id`. Default: `function (feature, layer) { }`
-     * @param {function} [args.pointToLayer=function (feature, latlng) { return L.marker(latlng, { icon: Utils.getCustomIcon(this.id), riseOnHover: true }); }] A function describing what to do when putting a geoJSON point to a layer.
-     * @param {object | function} [args.polygon_style=function (feature) { return {}; }] An object or function returning an object with L.Path options. https://leafletjs.com/reference.html#path
-     * @param {object | function} [args.polygon_style_highlight=function () { return { opacity: 1.0, fillOpacity: 0.7 }}] An object or function returning an object with L.Path options. https://leafletjs.com/reference.html#path
-     */
     addGeoJson(geojson, args) {
         let defaults = {
             create_feature_popup: true,
             pointToLayer: this.#default_pointToLayer,
             onEachFeature: this.#default_onEachFeature,
-            polygon_style: this.#default_polygon_style,
-            polygon_style_highlight: this.#default_polygon_style_highlight
         };
 
         let params = { ...defaults, ...args };
@@ -156,16 +113,9 @@ class InteractiveLayer {
 
                 this.#setFeature(feature.properties.id, layer);
             },
-            style: params.polygon_style
         });
 
         this.#geojsons.push(geojson_layer);
-
-        if (params.polygon_style_highlight instanceof Function) {
-            this.#polygon_style_highlights.set(geojson_layer, params.polygon_style_highlight.bind(this));
-        } else {
-            this.#polygon_style_highlights.set(geojson_layer, params.polygon_style_highlight);
-        }
 
         this.#feature_group.addLayer(geojson_layer);
         geojson_layer.eachLayer(layer => {
@@ -213,72 +163,11 @@ class InteractiveLayer {
     }
 
     /**
-     * Highlight a feature.
-     * @param {string} id Feature ID
-     */
-    highlightFeature(id) {
-        this.#getLayers(id).forEach(layer => {
-            if (layer instanceof L.Path) {
-                this.#highlightPolygon(layer);
-            } else {
-                // Marker
-                this.#highlightPoint(layer);
-            }
-        });
-
-        this.#interactive_map.getMap().on('click', () => { this.removeFeatureHighlight(id); });
-    }
-
-    /**
      * Check if this is a lay which should be visible by default.
      * @returns boolean
      */
     isDefault() {
         return this.#is_default;
-    }
-
-    /**
-     * Remove all currently active highlights for this layer group.
-     */
-    removeAllHighlights() {
-        this.#highlighted_layers.forEach(layer => {
-            if (layer instanceof L.Path) {
-                this.#removePolygonHighlight(layer);
-            } else {
-                this.#removePointHighlight(layer);
-            }
-        });
-
-        this.#highlighted_layers = [];
-        this.#interactive_map.getMap().off('click', this.removeAllHighlights, this);
-    }
-
-    /**
-     * Remove a active highlight for a feature.
-     * @param {string} id Feature ID
-     */
-    removeFeatureHighlight(id) {
-        // Remove from the same array that gets iterated
-        // https://stackoverflow.com/a/24813338
-        var layers = this.#getLayers(id);
-
-        for (const index of this.#reverseKeys(this.#highlighted_layers)) {
-            var layer = this.#highlighted_layers[index];
-
-            if (!layers.includes(layer)) {
-                continue;
-            }
-
-            if (layer instanceof L.Path) {
-                this.#removePolygonHighlight(layer);
-                this.#highlighted_layers.splice(index, 1);
-            } else {
-                this.#removePointHighlight(layer);
-                this.#highlighted_layers.splice(index, 1);
-            }
-        }
-
-        this.#interactive_map.getMap().off('click', () => { this.removeFeatureHighlight(id); });
     }
 
     /**
@@ -417,9 +306,9 @@ class InteractiveLayer {
             var list_entry = document.createElement('li');
             list_entry.className = 'flex-grow-1';
 
-            var leave_function = () => { this.removeFeatureHighlight(feature.properties.id); };
-            list_entry.addEventListener('mouseenter', () => { this.highlightFeature(feature.properties.id); });
-            list_entry.addEventListener('mouseleave', leave_function);
+            // todo
+            list_entry.addEventListener('mouseenter', () => { feature.properties.id });
+            list_entry.addEventListener('mouseleave', () => { feature.properties.id });
 
             var label = document.createElement('label');
             var leftSpan = document.createElement('span');
@@ -538,102 +427,6 @@ class InteractiveLayer {
     }
 
     /**
-     * Highlight a point (marker)
-     * @param {L.Layer} layer Marker
-     * @returns Nothing
-     */
-    #highlightPoint(layer) {
-        if (this.#highlighted_layers.includes(layer)) {
-            return;
-        }
-
-        var icon = layer.getIcon();
-        icon.options.html = `<div class="map-marker-ping"></div>${icon.options.html}`;
-        layer.setIcon(icon);
-
-        this.#highlighted_layers.push(layer);
-    }
-
-    /**
-     * Highlight a polygon
-     * @param {L.Layer} layer Polygon
-     * @returns Nothing
-     */
-    #highlightPolygon(layer) {
-        if (this.#highlighted_layers.includes(layer)) {
-            return;
-        }
-
-        this.#polygon_style_highlights.forEach((style, geojson) => {
-            if (geojson.hasLayer(layer)) {
-                if (style instanceof Function) {
-                    layer.setStyle(style(layer.feature));
-                } else {
-                    layer.setStyle(style);
-                }
-            }
-        });
-
-
-        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-            layer.bringToFront();
-        }
-
-        this.#highlighted_layers.push(layer);
-    }
-
-    /**
-     * Remove a highlight from a point (marker)
-     * @param {L.Layer} layer Marker
-     * @returns Nothing
-     */
-    #removePointHighlight(layer) {
-        if (!this.#highlighted_layers.includes(layer)) {
-            return;
-        }
-
-        var icon = layer.getIcon();
-        icon.options.html = icon.options.html.replace('<div class="map-marker-ping"></div>', '');
-        layer.setIcon(icon);
-    }
-
-    /**
-     * Remove a highlight from a polygon. If no layer is specified the whole geoJson will remove the highlight.
-     * @param {L.Layer} [layer=undefined] Polygon
-     * @returns Nothing
-     */
-    #removePolygonHighlight(layer = undefined) {
-        if (layer) {
-            if (!this.#highlighted_layers.includes(layer)) {
-                return;
-            }
-
-            this.#geojsons.forEach(geojson => {
-                if (geojson.hasLayer(layer)) {
-                    geojson.resetStyle(layer);
-                    return;
-                }
-            });
-            return;
-        }
-
-        this.#geojsons.forEach(geojson => {
-            geojson.resetStyle(layer);
-        });
-    }
-
-    // For removeFeatureHighlight()
-    // https://stackoverflow.com/a/24813338
-    * #reverseKeys(arr) {
-        var key = arr.length - 1;
-
-        while (key >= 0) {
-            yield key;
-            key -= 1;
-        }
-    }
-
-    /**
      * Map a layer to a feature ID.
      * @param {string} id Feature ID
      * @param {L.Layer} layer Feature layer
@@ -694,7 +487,7 @@ class InteractiveMap {
     }
 
     removeMap() {
-        this.#map.removeLayer(this.#cluster_group);
+//        this.#map.removeLayer(this.#cluster_group);
         this.#map.removeControl(this.#sidebar);
         this.#map.remove();
     }
@@ -783,16 +576,6 @@ class InteractiveMap {
 
     hasLayer(id) {
         return this.#interactive_layers.has(id);
-    }
-
-    /**
-     * Remove all currently active highlights.
-     */
-    removeAllHighlights() {
-        this.getLayers().forEach((layer, id) => {
-            layer.removeAllHighlights();
-        });
-        this.#map.off('click', this.removeAllHighlights, this);
     }
 
     zoomToBounds(bounds) {
@@ -895,7 +678,7 @@ function setCookie(name, value) {
     var date = new Date();
     date.setTime(date.getTime() + (30 * 24 * 60 * 60 * 1000));
     var expires = "; expires=" + date.toUTCString();
-    document.cookie = name + "=" + (value) + expires + "; path=/";
+    document.cookie = name + "=" + (value) + expires + "; path=/;SameSite=Strict";
 }
 
 function getCookie(name) {
@@ -1003,21 +786,17 @@ async function init(reload = false) {
     const response = await fetch('markers.json');
     const data = await response.json();
 
-    let katas_repo, test_results_id, markers_ver, test_results;
-    let results_str = '';
+    let katas_repo, test_results_id, markers_ver, results_str;
 
     const cached_katas = getCookie('python_katas');
     if (cached_katas) {
-        [katas_repo, test_results_id, markers_ver, test_results] = cached_katas.split('#');
+        [katas_repo, test_results_id, markers_ver, results_str] = cached_katas.split('#');
         document.getElementById('accountInput').value = katas_repo.split('/')[0];
         document.getElementById('repoInput').value = katas_repo.split('/')[1];
 
         const current_test_results_id = await fetchTestResultsId(katas_repo);
         if (current_test_results_id) {
-          if (test_results_id === current_test_results_id && markers_ver === data.version) {
-            results_str = test_results;
-
-          } else {
+          if (test_results_id !== current_test_results_id || markers_ver !== data.version) {
             const current_test_results = await fetchWorkflowJobs(katas_repo, current_test_results_id);
             results_str = data.features
               .filter(f => f.properties.type === 'destination')
@@ -1037,10 +816,10 @@ async function init(reload = false) {
             continue;
         }
 
-        const res = results_str.split('_')[i];
-
         f.properties.completed = 0;
         f.properties.required_steps = Math.min(f.properties.required_steps, f.properties.katas.length);
+
+        const res = results_str ? results_str.split('_')[i] : [];
         f.properties.katas = f.properties.katas.map((k, j) => {
           if (res[j] === '1') f.properties.completed++;
           return [...k, res[j]];
