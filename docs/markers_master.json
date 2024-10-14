@@ -10,7 +10,7 @@
         "destination_description": "Go to General Store",
         "required_steps": 20,
         "player_icon_class": "fas fa-bus pulse-effect",
-        "player_icon_style": "font-size: 25px; color: #000000",
+        "player_icon_style": "font-size: 30px; color: #000000",
         "steps": [
           [
             8.0625,
@@ -207,7 +207,7 @@
         "destination_description": "Go to Lemothe Garage",
         "required_steps": 40,
         "player_icon_class":  "fas fa-bicycle pulse-effect",
-        "player_icon_style":  "font-size: 25px; color: #000000; transform: scaleX(-1);",
+        "player_icon_style":  "font-size: 30px; color: #000000; transform: scaleX(-1);",
         "steps": [
           [
             62.09375,
@@ -452,7 +452,7 @@
         "destination_description": "Go to Hiking Parking",
         "required_steps": 40,
         "player_icon_class":  "fas fa-truck-pickup pulse-effect",
-        "player_icon_style":  "font-size: 25px; color: #000000",
+        "player_icon_style":  "font-size: 30px; color: #000000",
         "steps": [
           [
             32.78125,
@@ -813,7 +813,7 @@
         "destination_description": "Go to the East Coast Beach",
         "required_steps": 50,
         "player_icon_class":  "far fa-hiking pulse-effect",
-        "player_icon_style":  "font-size: 25px; color: #000000",
+        "player_icon_style":  "font-size: 30px; color: #000000",
         "steps": [
           [
             82.59375,
@@ -1302,7 +1302,7 @@
         "destination_description": "Go To Manastan Nord Helipad",
         "required_steps": 20,
         "player_icon_class":  "fas fa-helicopter pulse-effect",
-        "player_icon_style":  "font-size: 25px; color: #000000; transform: scaleX(-1);",
+        "player_icon_style":  "font-size: 30px; color: #000000; transform: scaleX(-1);",
         "steps": [
           [
             128.875,
@@ -1499,7 +1499,7 @@
         "destination_description": "Go to Hemilton's House",
         "required_steps": 20,
         "player_icon_class":  "fa-solid fa-person-swimming pulse-effect",
-        "player_icon_style":  "font-size: 25px; color: #000000; transform: scaleX(-1);",
+        "player_icon_style":  "font-size: 30px; color: #000000; transform: scaleX(-1);",
         "steps": [
           [
             84.9375,

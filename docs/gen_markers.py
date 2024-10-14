@@ -1,7 +1,7 @@
 import katas
 import json
 
-with open('docs/markers_master.json') as f:
+with open('markers_master.json') as f:
     markers_master = json.load(f)
 
 markers = {
@@ -17,5 +17,5 @@ for f in markers_master['features']:
     markers['features'].append(f)
 
 
-with open('docs/markers.json', 'w') as f:
+with open('markers.json', 'w') as f:
     json.dump(markers, f, indent=2)

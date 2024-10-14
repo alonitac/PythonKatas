@@ -792,7 +792,7 @@ document.getElementById('submitRepo').onclick = function() {
 let interactive_map;
 async function init(reload = false) {
 
-    const response = await fetch('markers.json');
+    const response = await fetch('https://exit-zero-academy.github.io/DevOpsTheHardWayAssets/python_katas_map/markers.json');
     const data = await response.json();
 
     let katas_repo, test_results_id, markers_ver, results_str;

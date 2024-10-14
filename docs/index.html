@@ -2,23 +2,16 @@
 <html>
 
 <head>
-	<title>Python Katas - Interactive Map</title>
+	<title>Python Katas</title>
 
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 	<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
-	<!-- Leaflet's CSS -->
+	<!-- Leaflet -->
 	<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" crossorigin="" />
-
-	<!-- Make sure you put this AFTER Leaflet's CSS -->
 	<script src="https://unpkg.com/leaflet/dist/leaflet.js" crossorigin=""></script>
-
-	<!-- Grouping markers to cluster -->
-	<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" crossorigin="" />
-	<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" crossorigin="" />
-	<script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js" crossorigin=""></script>
 
 	<!-- Nested marker cluster -->
 	<script src="https://unpkg.com/leaflet.featuregroup.subgroup@latest/dist/leaflet.featuregroup.subgroup.js"></script>
@@ -32,24 +25,15 @@
 	<link rel="stylesheet" href="https://unpkg.com/leaflet-sidebar-v2/css/leaflet-sidebar.css" crossorigin="" />
 	<script src="https://unpkg.com/leaflet-sidebar-v2/js/leaflet-sidebar.min.js" crossorigin=""></script>
 
-	<!-- Marker editor -->
-	<link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.css" crossorigin="" />
-	<script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.min.js" crossorigin=""></script>
-
 	<link rel="stylesheet" href="https://exit-zero-academy.github.io/DevOpsTheHardWayAssets/python_katas_map/style.css" />
 </head>
 
 <body>
 	<div class="leaflet-control-layers-base leaflet-control-layers leaflet-control" style="position: absolute; top: 10px; left: 50%; background: white; padding: 10px; z-index: 1000; transform: translate(-50%, 0%);display: flex; justify-content: center; align-items: center;">
-		<span id="mainTitle">Python Katas for DevOps</span>
-	</div>
-
-	<div id="repoModal" class="leaflet-control-layers-base leaflet-control-layers leaflet-control" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:white; padding:20px; center;box-shadow:0 2px 10px rgba(0,0,0,0.1); z-index:1000;">
-		<label>Enter Your Python Katas GitHub Repo (e.g. alonitac/PythonKatas)</label>
-		<input type="text" id="repoInput" placeholder="username/repo" />
-		<button id="submitRepo">Go</button>
-		<button id="closeModal">Close</button>
-		<div id="modalTooltip" style="color:red; visibility:hidden;"></div>
+		<span id="mainTitle">Python Katas for DevOps: </span>
+		<input type="text" id="accountInput" style="width: 100px; margin-left: 5px;" placeholder="GitHubAccount" /> /
+		<input type="text" id="repoInput" style="width: 120px; margin-right: 5px;" placeholder="PythonKatasRepo" />
+		<button id="submitRepo">Load Map</button>
 	</div>
 
 	<div id="map"></div>
