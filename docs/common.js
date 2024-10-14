@@ -651,12 +651,21 @@ Utils
 
 class Utils {
     static getCustomIcon(feature) {
-        var colorClass = feature.properties.current ? 'current' : (feature.properties.achieved ? 'achieved' : 'noncurrent');
-        var remaining = feature.properties.required_steps - feature.properties.completed;
-        var marker_html = feature.properties.type != 'destination' ? feature.properties.icon_element
-         : `<i class="leaflet-marker-icon marker-cluster marker-cluster-${colorClass}-background marker-cluster-${colorClass} ${colorClass === 'current' ? 'pulse-effect' : ''}" style="pointer-events: auto !important; margin-left: -20px; margin-top: -20px; width: 40px; height: 40px; opacity: 1"><div><span>${remaining > 0 ? remaining : '<i class="fa-solid fa-crown"></i>'}</span></div></i>`;
-        var iconSize = feature.properties.type != 'destination' ? 23 : 8;
-        var popupLocationSize = feature.properties.type != 'destination' ? [5, -10] : [-5, -40];
+        if (feature.properties.type === 'destination') {
+            var colorClass = feature.properties.current ? 'current' : (feature.properties.achieved ? 'achieved' : 'noncurrent');
+            var remaining = feature.properties.required_steps - feature.properties.completed;
+            var marker_html = `<i class="leaflet-marker-icon marker-cluster marker-cluster-${colorClass}-background marker-cluster-${colorClass} ${colorClass === 'current' ? 'pulse-effect' : ''}" style="pointer-events: auto !important; margin-left: -20px; margin-top: -20px; width: 40px; height: 40px; opacity: 1"><div><span>${remaining > 0 ? remaining : '<i class="fa-solid fa-crown"></i>'}</span></div></i>`;
+            var iconSize = 8;
+            var popupLocationSize = [-5, -40];
+        } else if (feature.properties.type === 'player') {
+            var marker_html = `<div style='${feature.properties.icon_style}'><i class='${feature.properties.icon_class}'></i></div>`;
+            var iconSize = 23;
+            var popupLocationSize = [5, -10];
+        } else if (feature.properties.type === 'mcq') {
+            var marker_html = `<i class='${feature.properties.icon_class}' style='${feature.properties.icon_style}'></i>`
+            var iconSize = 23;
+            var popupLocationSize = [5, -10];
+        }
 
         return L.divIcon({
             className: 'map-marker',
@@ -835,7 +844,8 @@ async function init(reload = false) {
                 "id": f.properties.id,
                 "name": "You Are Here",
                 "description": f.properties.destination_description,
-                "icon_element": f.properties.icon_element
+                "icon_class": f.properties.player_icon_class,
+                "icon_style": f.properties.player_icon_style
               },
               "geometry": {
                 "type": "Point",

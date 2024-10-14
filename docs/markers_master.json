@@ -9,7 +9,8 @@
         "id": "The Basics",
         "destination_description": "Go to General Store",
         "required_steps": 20,
-        "icon_element": "<i class='fas fa-bus pulse-effect' style='font-size: 25px; color: #000000'></i>",
+        "player_icon_class": "fas fa-bus pulse-effect",
+        "player_icon_style": "font-size: 25px; color: #000000",
         "steps": [
           [
             8.0625,
@@ -205,7 +206,8 @@
         "id": "Flow Control",
         "destination_description": "Go to Lemothe Garage",
         "required_steps": 40,
-        "icon_element": "<i class='fas fa-bicycle pulse-effect' style='font-size: 25px; color: #000000'></i>",
+        "player_icon_class":  "fas fa-bicycle pulse-effect",
+        "player_icon_style":  "font-size: 25px; color: #000000; transform: scaleX(-1);",
         "steps": [
           [
             62.09375,
@@ -449,7 +451,8 @@
         "id": "Loops",
         "destination_description": "Go to Hiking Parking",
         "required_steps": 40,
-        "icon_element": "<i class='fas fa-truck-pickup pulse-effect' style='font-size: 25px; color: #000000'></i>",
+        "player_icon_class":  "fas fa-truck-pickup pulse-effect",
+        "player_icon_style":  "font-size: 25px; color: #000000",
         "steps": [
           [
             32.78125,
@@ -809,7 +812,8 @@
         "id": "Data Structures",
         "destination_description": "Go to the East Coast Beach",
         "required_steps": 50,
-        "icon_element": "<i class='far fa-hiking pulse-effect' style='font-size: 25px; color: #000000'></i>",
+        "player_icon_class":  "far fa-hiking pulse-effect",
+        "player_icon_style":  "font-size: 25px; color: #000000",
         "steps": [
           [
             82.59375,
@@ -1297,7 +1301,8 @@
         "id": "I/O and Error Handling",
         "destination_description": "Go To Manastan Nord Helipad",
         "required_steps": 20,
-        "icon_element": "<i class='fas fa-helicopter pulse-effect' style='font-size: 25px; color: #000000'></i>",
+        "player_icon_class":  "fas fa-helicopter pulse-effect",
+        "player_icon_style":  "font-size: 25px; color: #000000; transform: scaleX(-1);",
         "steps": [
           [
             128.875,
@@ -1493,7 +1498,8 @@
         "id": "Classes",
         "destination_description": "Go to Hemilton's House",
         "required_steps": 20,
-        "icon_element": "<i class='fa-solid fa-person-swimming pulse-effect' style='font-size: 25px; color: #000000'></i>",
+        "player_icon_class":  "fa-solid fa-person-swimming pulse-effect",
+        "player_icon_style":  "font-size: 25px; color: #000000; transform: scaleX(-1);",
         "steps": [
           [
             84.9375,
@@ -1684,7 +1690,8 @@
         "_id": "mcq1",
         "id": "mcq1",
         "iframe_url": "https://exit-zero-academy.github.io/DevOpsTheHardWayAssets/multichoice-questions/python_variables.html",
-        "icon_element": "</i><i class='far fa-check-circle' style='font-size: 17px; color: #CB6040'></i>"
+        "icon_class":  "far fa-check-circle",
+        "icon_style":  "font-size: 17px; color: #CB6040"
       },
       "geometry": {
         "type": "Point",
@@ -1701,7 +1708,8 @@
         "_id": "mcq2",
         "id": "mcq2",
         "iframe_url": "https://exit-zero-academy.github.io/DevOpsTheHardWayAssets/multichoice-questions/python_variables.html",
-        "icon_element": "<i class='far fa-check-circle' style='font-size: 17px; color: #CB6040'></i>"
+        "icon_class":  "far fa-check-circle",
+        "icon_style":  "font-size: 17px; color: #CB6040"
       },
       "geometry": {
         "type": "Point",
@@ -1718,7 +1726,8 @@
         "_id": "mcq3",
         "id": "mcq3",
         "iframe_url": "https://exit-zero-academy.github.io/DevOpsTheHardWayAssets/multichoice-questions/python_variables.html",
-        "icon_element": "<i class='far fa-check-circle' style='font-size: 17px; color: #CB6040'></i>"
+        "icon_class":  "far fa-check-circle",
+        "icon_style":  "font-size: 17px; color: #CB6040"
       },
       "geometry": {
         "type": "Point",
@@ -1735,7 +1744,8 @@
         "_id": "mcq5",
         "id": "mcq5",
         "iframe_url": "https://exit-zero-academy.github.io/DevOpsTheHardWayAssets/multichoice-questions/python_variables.html",
-        "icon_element": "<i class='far fa-check-circle' style='font-size: 17px; color: #CB6040'></i>"
+        "icon_class":  "far fa-check-circle",
+        "icon_style":  "font-size: 17px; color: #CB6040"
       },
       "geometry": {
         "type": "Point",
@@ -1752,7 +1762,8 @@
         "_id": "mcq6",
         "id": "mcq6",
         "iframe_url": "https://exit-zero-academy.github.io/DevOpsTheHardWayAssets/multichoice-questions/python_variables.html",
-        "icon_element": "<i class='far fa-check-circle' style='font-size: 17px; color: #CB6040'></i>"
+        "icon_class":  "far fa-check-circle",
+        "icon_style":  "font-size: 17px; color: #CB6040"
       },
       "geometry": {
         "type": "Point",
@@ -1769,7 +1780,8 @@
         "_id": "mcq7",
         "id": "mcq7",
         "iframe_url": "https://exit-zero-academy.github.io/DevOpsTheHardWayAssets/multichoice-questions/python_variables.html",
-        "icon_element": "<i class='far fa-check-circle' style='font-size: 17px; color: #CB6040'></i>"
+        "icon_class":  "far fa-check-circle",
+        "icon_style":  "font-size: 17px; color: #CB6040"
       },
       "geometry": {
         "type": "Point",
