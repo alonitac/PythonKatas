@@ -282,14 +282,6 @@ class InteractiveLayer {
     }
 
     /**
-     * Remove a layer from the layer group.
-     * @param {L.Layer} layer L.Layer to remove.
-     */
-    removeLayer(layer) {
-        this.#getGroupForEdit(layer).removeLayer(layer);
-    }
-
-    /**
      * Set the amount of columns of the sidebar grid.
      * @returns Nothing
      */
@@ -352,31 +344,8 @@ class InteractiveLayer {
             return;
         }
 
-        var group = this.#getGroupForEdit(layer);
-
-        if (group instanceof L.MarkerClusterGroup && group.hasLayer(layer)) {
-            // Single Point
-            group.zoomToShowLayer(layer, () => {
-                // Zoom in further if we can
-                window.setTimeout(() => {
-                    if (this.#interactive_map.getMap().getZoom() < this.#interactive_map.getMaxZoom()) {
-                        this.#interactive_map.zoomToBounds(this.#getLayerBounds(id));
-                    }
-                }, 300);
-            });
-            return;
-        }
-
         // not visible
         this.#interactive_map.zoomToBounds(this.#getLayerBounds(id));
-    }
-
-    /**
-     * Add a layer back to the group it belongs to. That should be the original L.geoJSON but has to be the the parent MarkerCluster if the geoJSON was added to a marker cluster.
-     * @param {L.Layer} layer L.Layer
-     */
-    #addLayer(layer) {
-        this.#getGroupForEdit(layer).addLayer(layer);
     }
 
     /**
@@ -529,29 +498,6 @@ class InteractiveLayer {
         document.getElementById(this.id).appendChild(list);
 
         return list;
-    }
-
-    /**
-     * Get the layer group for adding and removing layers. This can differ from their original layer group.
-     * @param {L.Layer} layer Layer
-     * @returns L.LayerGroup
-     */
-    #getGroupForEdit(layer) {
-        // The group is the GeoJSON FeatureGroup
-        var group = this.#feature_group.getLayer(layer.feature._origin);
-        var parent_group = this.#feature_group;
-
-        // Subgroups can be nested, get top level
-        while (parent_group instanceof L.FeatureGroup.SubGroup) {
-            parent_group = this.#feature_group.getParentGroup();
-        }
-
-        // There's an issue with marker from a geojson with marker cluster so we have use parent cluster then
-        if (parent_group instanceof L.MarkerClusterGroup) {
-            group = parent_group;
-        }
-
-        return group;
     }
 
     /**
@@ -743,11 +689,6 @@ class InteractiveMap {
         });
         this.MAX_ZOOM = params.max_good_zoom;
         this.#website_subdir = params.website_subdir;
-
-        this.#cluster_group = L.markerClusterGroup({
-            spiderfyOnMaxZoom: true,
-            maxClusterRadius: params.maxClusterRadius
-        }).addTo(this.#map);
 
         this.#setUpSidebar(params.attribution, params.website_source, this.#website_subdir);
     }
