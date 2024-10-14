@@ -702,16 +702,8 @@ class InteractiveLayer {
 }
 
 
-
-
-
-
-
-
 /*
-
 Interactive map
-
 */
 
 
@@ -935,9 +927,10 @@ Utils
 
 class Utils {
     static getCustomIcon(feature) {
-        var colorClass = feature.properties.current ? 'current' : (feature.properties.achieved ? 'achieved' : 'noncurrent')
+        var colorClass = feature.properties.current ? 'current' : (feature.properties.achieved ? 'achieved' : 'noncurrent');
+        var remaining = feature.properties.required_steps - feature.properties.completed;
         var marker_html = feature.properties.type != 'destination' ? feature.properties.icon_element
-         : `<i class="leaflet-marker-icon marker-cluster marker-cluster-${colorClass}-background marker-cluster-${colorClass}" style="pointer-events: auto !important; margin-left: -20px; margin-top: -20px; width: 40px; height: 40px; opacity: 1"><div><span>${feature.properties.required_steps - feature.properties.completed}</span></div></i>`;
+         : `<i class="leaflet-marker-icon marker-cluster marker-cluster-${colorClass}-background marker-cluster-${colorClass} ${colorClass === 'current' ? 'pulse-effect' : ''}" style="pointer-events: auto !important; margin-left: -20px; margin-top: -20px; width: 40px; height: 40px; opacity: 1"><div><span>${remaining > 0 ? remaining : '<i class="fa-solid fa-crown"></i>'}</span></div></i>`;
         var iconSize = feature.properties.type != 'destination' ? 23 : 8;
         var popupLocationSize = feature.properties.type != 'destination' ? [5, -10] : [-5, -40];
 
@@ -1049,22 +1042,16 @@ function triggerFireworks() {
     }());
 }
 
-document.getElementById('closeModal').onclick = function() {
-    document.getElementById('repoModal').style.display = 'none';
-};
 
 document.getElementById('submitRepo').onclick = function() {
+    const accountInput = document.getElementById('accountInput').value;
     const repoInput = document.getElementById('repoInput').value;
-    const regex = /^[a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+$/; // Regex for username/repo format
+    const fullName = accountInput + '/' + repoInput;
+    const regex = /^[a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+$/;
 
-    if (regex.test(repoInput.trim())) {
-        setCookie('python_katas', repoInput.trim() + '#null#null#');
-        document.getElementById('repoModal').style.display = 'none';
+    if (regex.test(fullName.trim())) {
+        setCookie('python_katas', fullName.trim() + '#null#null#');
         location.reload();
-
-    } else {
-        document.getElementById('modalTooltip').textContent = 'Please enter a valid GitHub repository.';
-        document.getElementById('modalTooltip').style.visibility = 'visible';
     }
 };
 
@@ -1079,13 +1066,10 @@ async function init(reload = false) {
     let results_str = '';
 
     const cached_katas = getCookie('python_katas');
-    if (!cached_katas) {
-        document.getElementById('repoModal').style.display = 'block';
-        document.getElementById('modalTooltip').style.visibility = 'hidden';
-    } else {
+    if (cached_katas) {
         [katas_repo, test_results_id, markers_ver, test_results] = cached_katas.split('#');
-        document.getElementById('repoInput').value = katas_repo;
-        document.getElementById('mainTitle').innerHTML = "Python Katas for DevOps: <b>" + katas_repo + "</b>";
+        document.getElementById('accountInput').value = katas_repo.split('/')[0];
+        document.getElementById('repoInput').value = katas_repo.split('/')[1];
 
         const current_test_results_id = await fetchTestResultsId(katas_repo);
         if (current_test_results_id) {
@@ -1115,6 +1099,7 @@ async function init(reload = false) {
         const res = results_str.split('_')[i];
 
         f.properties.completed = 0;
+        f.properties.required_steps = Math.min(f.properties.required_steps, f.properties.katas.length);
         f.properties.katas = f.properties.katas.map((k, j) => {
           if (res[j] === '1') f.properties.completed++;
           return [...k, res[j]];
@@ -1142,8 +1127,10 @@ async function init(reload = false) {
         }
     }
 
-    data.features.push(player);
-    current_feature.properties.current = true;
+    if (player) {
+        data.features.push(player);
+        current_feature.properties.current = true;
+    }
 
     if (interactive_map) {
         interactive_map.removeMap();
@@ -1179,6 +1166,3 @@ async function init(reload = false) {
         triggerFireworks();
     }
 }
-
-
-// todo 1. reload  2. no need to enter repo manually

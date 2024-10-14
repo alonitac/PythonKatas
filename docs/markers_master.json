@@ -9,7 +9,7 @@
         "id": "The Basics",
         "destination_description": "Go to General Store",
         "required_steps": 20,
-        "icon_element": "<i class='fas fa-bus' style='font-size: 23px; color: #000000'></i>",
+        "icon_element": "<i class='fas fa-bus pulse-effect' style='font-size: 25px; color: #000000'></i>",
         "steps": [
           [
             8.0625,
@@ -205,7 +205,7 @@
         "id": "Flow Control",
         "destination_description": "Go to Lemothe Garage",
         "required_steps": 40,
-        "icon_element": "<i class='fas fa-bicycle' style='font-size: 23px; color: #000000'></i>",
+        "icon_element": "<i class='fas fa-bicycle pulse-effect' style='font-size: 25px; color: #000000'></i>",
         "steps": [
           [
             62.09375,
@@ -449,7 +449,7 @@
         "id": "Loops",
         "destination_description": "Go to Hiking Parking",
         "required_steps": 40,
-        "icon_element": "<i class='fas fa-truck-pickup' style='font-size: 23px; color: #000000'></i>",
+        "icon_element": "<i class='fas fa-truck-pickup pulse-effect' style='font-size: 25px; color: #000000'></i>",
         "steps": [
           [
             32.78125,
@@ -809,7 +809,7 @@
         "id": "Data Structures",
         "destination_description": "Go to the East Coast Beach",
         "required_steps": 50,
-        "icon_element": "<i class='far fa-hiking' style='font-size: 23px; color: #000000'></i>",
+        "icon_element": "<i class='far fa-hiking pulse-effect' style='font-size: 25px; color: #000000'></i>",
         "steps": [
           [
             82.59375,
@@ -1297,7 +1297,7 @@
         "id": "I/O and Error Handling",
         "destination_description": "Go To Manastan Nord Helipad",
         "required_steps": 20,
-        "icon_element": "<i class='fas fa-helicopter' style='font-size: 23px; color: #000000'></i>",
+        "icon_element": "<i class='fas fa-helicopter pulse-effect' style='font-size: 25px; color: #000000'></i>",
         "steps": [
           [
             128.875,
@@ -1493,7 +1493,7 @@
         "id": "Classes",
         "destination_description": "Go to Hemilton's House",
         "required_steps": 20,
-        "icon_element": "<i class='fa-person-swimming' style='font-size: 23px; color: #000000'></i>",
+        "icon_element": "<i class='fa-solid fa-person-swimming pulse-effect' style='font-size: 25px; color: #000000'></i>",
         "steps": [
           [
             84.9375,
