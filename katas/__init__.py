@@ -1,13 +1,3 @@
-import sys
-import os
-
-original_stdout = sys.stdout
-sys.stdout = open(os.devnull, 'w')
-from problematic_module import desired_function
-sys.stdout.close()
-sys.stdout = original_stdout
-
-
 katas = {
     "intro": [
         ('hello_world.py', 'function structure'),
