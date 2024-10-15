@@ -4,14 +4,16 @@ def numbers_division(a, b):
     """
 
 
-result = numbers_division(10, 3)
-print(result)  # Expected output: 3.3333
+if __name__ == '__main__':
+    result = numbers_division(10, 3)
+    print(result)  # Expected output: 3.3333
 
-result = numbers_division(8, 2)
-print(result)  # Expected output: 4.0
+    result = numbers_division(8, 2)
+    print(result)  # Expected output: 4.0
 
-result = numbers_division(5, 2)
-print(result)  # Expected output: 2.5
+    result = numbers_division(5, 2)
+    print(result)  # Expected output: 2.5
+
 
 """
 To complete this exercise:

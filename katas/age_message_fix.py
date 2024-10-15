@@ -6,14 +6,16 @@ def age_message(age):
     return message
 
 
-result = age_message(25)
-print(result)  # "I am 25 years old." expected
+if __name__ == '__main__':
+    result = age_message(25)
+    print(result)  # "I am 25 years old." expected
+
 
 """
 To complete this exercise:
 --------------------------
-Fix the function call - i.e. "result = age_message(25)" - so the program runs properly.
-Modify only the function call, without changing the `age_message` function implementation itself.
+Fix the function so the program runs properly.
+ 
  
 Exercise Breakdown:
 -------------------

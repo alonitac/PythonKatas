@@ -4,15 +4,15 @@ def add_string_numbers(num1, num2, num3):
     """
 
 
+if __name__ == '__main__':
+    result = add_string_numbers("10", "20", "30")
+    print(result)  # 60 expected
 
-result = add_string_numbers("10", "20", "30")
-print(result)  # 60 expected
+    result = add_string_numbers("5", "15", "25")
+    print(result)  # 45 expected
 
-result = add_string_numbers("5", "15", "25")
-print(result)  # 45 expected
-
-result = add_string_numbers("100", "200", "300")
-print(result)  # 600 expected
+    result = add_string_numbers("100", "200", "300")
+    print(result)  # 600 expected
 
 
 """

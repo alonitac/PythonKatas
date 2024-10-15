@@ -4,8 +4,10 @@ def greeting(name):
     """
 
 
-greeting_msg = greeting('David')
-print(greeting_msg)  # "hello David" should be printed
+if __name__ == '__main__':
+    greeting_msg = greeting('David')
+    print(greeting_msg)  # "hello David" should be printed
+
 
 """
 To complete this exercise:

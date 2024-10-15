@@ -6,13 +6,15 @@ def calculator1(num1, num2):
         return num1 + num2
 
 
-result = calculator1(1, 1)  # 2 expected
-print(result)
+if __name__ == '__main__':
+    result = calculator1(1, 1)  # 2 expected
+    print(result)
 
-# TODO fill in the correct arguments
-print(calculator1())  # 0 expected
-print(calculator1())  # -8 expected
-print(calculator1())  # None expected
+    # TODO fill in the correct arguments
+    print(calculator1())  # 0 expected
+    print(calculator1())  # -8 expected
+    print(calculator1())  # None expected
+
 
 """
 To complete this exercise:
